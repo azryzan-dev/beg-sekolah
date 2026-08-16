@@ -979,7 +979,7 @@
     </div>
 
     <!-- MODAL: JADUAL / SUBJEK -->
-    <div class="modal-backdrop" id="scheduleModal">
+<div class="modal-backdrop" id="scheduleModal">
         <div class="modal-content">
             <div class="modal-header">
                 <h3 id="scheduleModalTitle">📚 Tambah Subjek</h3>
@@ -1009,6 +1009,51 @@
                         </select>
                     </div>
                 </div>
+
+                <div class="form-group">
+                    <label>Nama Subjek / Perkara</label>
+                    <input type="text" id="scheduleSubject" required placeholder="Contoh: Matematik / Bahasa Melayu">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Masa Mula</label>
+                        <input type="time" id="scheduleStart" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Masa Tamat</label>
+                        <input type="time" id="scheduleEnd">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Buku / Peralatan Perlu Dibawa (Koma-separated)</label>
+                    <input type="text" id="scheduleBooks" placeholder="Contoh: Buku Teks Jilid 1, Buku Latihan A, Pembaris">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nota / Pesanan Guru</label>
+                        <input type="text" id="scheduleNote" placeholder="Contoh: Kerja rumah M/S 12">
+                    </div>
+                    <div class="form-group">
+                        <label>Peringatan Notifikasi (Minit awal)</label>
+                        <select id="scheduleReminder">
+                            <option value="5">5 Minit Awal</option>
+                            <option value="10" selected>10 Minit Awal</option>
+                            <option value="15">15 Minit Awal</option>
+                            <option value="30">30 Minit Awal</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px;">
+                    <button type="button" class="btn btn-light" onclick="closeModal('scheduleModal')">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan Subjek</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- MODAL: SALIN JADUAL HARI -->
     <div class="modal-backdrop" id="copyDayModal">
