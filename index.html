@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#4f46e5">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Beg Sekolah">
+    <link rel="apple-touch-icon" href="https://placehold.co/192x192/4f46e5/ffffff?text=🎒">
     <title>Beg Sekolah - Pengurusan Jadual & Ko-Kurikulum</title>
     <!-- Font & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -781,6 +785,12 @@
             </div>
 
             <div class="header-actions">
+                <button id="pwaInstallBtn" class="btn btn-light btn-sm" style="display:none;" onclick="installPWA()">
+                    📱 Pasang App
+                </button>
+                <button class="btn btn-light btn-sm" onclick="openThemeModal()">
+                    🎨 Tema & Ikon
+                </button>
                 <button class="btn btn-light btn-sm" onclick="openStudentModal()">
                     👦 Pelajar
                 </button>
@@ -923,7 +933,12 @@
             <!-- DATA MANAGEMENT (DIPINDAHKAN KE PALING BAWAH) -->
             <div class="card">
                 <div class="card-header">
-                    <span class="card-title">⚙️ Data & Tetapan</span>
+                    <span class="card-title">⚙️ Data & Tetapan Aplikasi</span>
+                </div>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 12px;">
+                    <button class="btn btn-secondary" style="flex: 1; min-width: 200px;" onclick="openThemeModal()">
+                        🎨 Tukar Warna & Ikon Aplikasi
+                    </button>
                 </div>
                 <div style="display: flex; gap: 12px; flex-wrap: wrap;">
                     <button class="btn btn-light" style="flex: 1; min-width: 200px;" onclick="exportAppData()">
@@ -938,6 +953,39 @@
         </section>
 
     </main>
+
+    <!-- MODAL: TETAPAN TEMA & IKON -->
+    <div class="modal-backdrop" id="themeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🎨 Tetapan Warna & Ikon Aplikasi</h3>
+                <button class="btn btn-light btn-sm" onclick="closeModal('themeModal')">✕</button>
+            </div>
+            
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">
+                Pilih palet warna dan ikon kegemaran anda untuk memperibadikan paparan aplikasi Beg Sekolah.
+            </p>
+
+            <div class="form-group">
+                <label>Pilih Ikon Utama Aplikasi</label>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px;" id="iconPickerGrid">
+                    <!-- Dynamic icons built via JavaScript -->
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 18px;">
+                <label>Pilih Warna Tema Aplikasi</label>
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-top: 8px;" id="colorPickerGrid">
+                    <!-- Dynamic color palettes built via JavaScript -->
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px;">
+                <button type="button" class="btn btn-light" onclick="closeModal('themeModal')">Batal</button>
+                <button type="button" class="btn btn-primary" onclick="saveThemeSettings()">Simpan Tetapan</button>
+            </div>
+        </div>
+    </div>
 
     <!-- MODAL: PELAJAR -->
     <div class="modal-backdrop" id="studentModal">
@@ -1184,16 +1232,95 @@
             0: "Ahad"
         };
 
+        const THEME_PALETTES = [
+            { id: 'indigo', name: 'Indigo Classic', primary: '#4f46e5', hover: '#4338ca', gradient: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)' },
+            { id: 'emerald', name: 'Emerald Green', primary: '#059669', hover: '#047857', gradient: 'linear-gradient(135deg, #059669 0%, #0d9488 100%)' },
+            { id: 'ocean', name: 'Ocean Blue', primary: '#0284c7', hover: '#0369a1', gradient: 'linear-gradient(135deg, #0284c7 0%, #2563eb 100%)' },
+            { id: 'purple', name: 'Royal Purple', primary: '#7c3aed', hover: '#6d28d9', gradient: 'linear-gradient(135deg, #7c3aed 0%, #c026d3 100%)' },
+            { id: 'orange', name: 'Sunset Orange', primary: '#ea580c', hover: '#c2410c', gradient: 'linear-gradient(135deg, #ea580c 0%, #e11d48 100%)' },
+            { id: 'rose', name: 'Rose Pink', primary: '#e11d48', hover: '#be123c', gradient: 'linear-gradient(135deg, #e11d48 0%, #9333ea 100%)' },
+            { id: 'charcoal', name: 'Dark Charcoal', primary: '#1e293b', hover: '#0f172a', gradient: 'linear-gradient(135deg, #1e293b 0%, #334155 100%)' }
+        ];
+
+        const APP_ICONS = ['🎒', '📚', '🏫', '🎓', '✏️', '🌟', '🚀', '🎨'];
+
+        let selectedThemeId = 'indigo';
+        let selectedAppIcon = '🎒';
+
         let appData = {
             students: [],
             activeStudentId: null,
             schedules: [],
             packedState: {}, // key: `${studentId}_${day}_${item}` -> boolean
             tasks: [],
-            cocurricular: []
+            cocurricular: [],
+            themeSettings: { paletteId: 'indigo', icon: '🎒' }
         };
 
         let selectedDay = new Date().getDay(); // Default current day (0-6)
+
+        let deferredPrompt = null;
+
+        // Dynamic Manifest registration
+        (function initPWA() {
+            const manifestData = {
+                name: "Beg Sekolah - Pengurusan Jadual",
+                short_name: "Beg Sekolah",
+                start_url: "./",
+                display: "standalone",
+                background_color: "#f8fafc",
+                theme_color: "#4f46e5",
+                icons: [
+                    {
+                        src: "https://placehold.co/192x192/4f46e5/ffffff?text=🎒",
+                        sizes: "192x192",
+                        type: "image/png"
+                    },
+                    {
+                        src: "https://placehold.co/512x512/4f46e5/ffffff?text=🎒",
+                        sizes: "512x512",
+                        type: "image/png"
+                    }
+                ]
+            };
+            const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
+            const manifestURL = URL.createObjectURL(manifestBlob);
+            const link = document.createElement('link');
+            link.rel = 'manifest';
+            link.href = manifestURL;
+            document.head.appendChild(link);
+
+            // Inline Service Worker for Offline access
+            if ('serviceWorker' in navigator) {
+                const swCode = `
+                    self.addEventListener('install', e => self.skipWaiting());
+                    self.addEventListener('activate', e => self.clients.claim());
+                    self.addEventListener('fetch', e => e.respondWith(fetch(e.request).catch(() => caches.match(e.request))));
+                `;
+                const swBlob = new Blob([swCode], { type: 'text/javascript' });
+                navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(() => {});
+            }
+        })();
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            const btn = document.getElementById('pwaInstallBtn');
+            if (btn) btn.style.display = 'inline-flex';
+        });
+
+        function installPWA() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        showToast("Aplikasi Beg Sekolah berjaya dipasang!");
+                    }
+                    deferredPrompt = null;
+                    document.getElementById('pwaInstallBtn').style.display = 'none';
+                });
+            }
+        }
 
         // Initialize App
         window.addEventListener('DOMContentLoaded', () => {
@@ -1201,6 +1328,7 @@
             if (appData.students.length === 0) {
                 loadSampleData(false);
             }
+            applyTheme();
             renderAll();
             updateCurrentDateDisplay();
         });
@@ -1210,10 +1338,99 @@
             if (stored) {
                 try {
                     appData = JSON.parse(stored);
+                    if (!appData.themeSettings) {
+                        appData.themeSettings = { paletteId: 'indigo', icon: '🎒' };
+                    }
+                    selectedThemeId = appData.themeSettings.paletteId || 'indigo';
+                    selectedAppIcon = appData.themeSettings.icon || '🎒';
                 } catch(e) {
                     console.error("Gagal membaca LocalStorage:", e);
                 }
             }
+        }
+
+        function applyTheme() {
+            const theme = THEME_PALETTES.find(t => t.id === selectedThemeId) || THEME_PALETTES[0];
+            
+            // Set CSS Root variables
+            document.documentElement.style.setProperty('--primary', theme.primary);
+            document.documentElement.style.setProperty('--primary-hover', theme.hover);
+
+            // Set Header gradient
+            const header = document.querySelector('.header');
+            if (header) {
+                header.style.background = theme.gradient;
+            }
+
+            // Set App Logo Icon
+            const logoIcon = document.querySelector('.brand-logo');
+            if (logoIcon) {
+                logoIcon.textContent = selectedAppIcon;
+            }
+
+            // Update Meta theme-color for browser navigation bar
+            const metaTheme = document.querySelector('meta[name="theme-color"]');
+            if (metaTheme) {
+                metaTheme.setAttribute('content', theme.primary);
+            }
+        }
+
+        function openThemeModal() {
+            renderThemeModalContent();
+            openModal('themeModal');
+        }
+
+        function renderThemeModalContent() {
+            // Render Icon Picker Grid
+            const iconGrid = document.getElementById('iconPickerGrid');
+            iconGrid.innerHTML = '';
+            APP_ICONS.forEach(icon => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = `btn ${selectedAppIcon === icon ? 'btn-primary' : 'btn-light'}`;
+                btn.style.fontSize = '1.3rem';
+                btn.style.padding = '8px 14px';
+                btn.textContent = icon;
+                btn.onclick = () => {
+                    selectedAppIcon = icon;
+                    renderThemeModalContent();
+                };
+                iconGrid.appendChild(btn);
+            });
+
+            // Render Color Picker Grid
+            const colorGrid = document.getElementById('colorPickerGrid');
+            colorGrid.innerHTML = '';
+            THEME_PALETTES.forEach(p => {
+                const isSelected = selectedThemeId === p.id;
+                const card = document.createElement('div');
+                card.style.padding = '10px';
+                card.style.borderRadius = 'var(--radius-md)';
+                card.style.border = isSelected ? '2px solid var(--text-main)' : '1px solid var(--card-border)';
+                card.style.background = '#fafafa';
+                card.style.cursor = 'pointer';
+                card.onclick = () => {
+                    selectedThemeId = p.id;
+                    renderThemeModalContent();
+                };
+
+                card.innerHTML = `
+                    <div style="height:24px; border-radius:6px; background:${p.gradient}; margin-bottom:6px;"></div>
+                    <span style="font-size:0.775rem; font-weight:700; display:block;">${p.name} ${isSelected ? '✓' : ''}</span>
+                `;
+                colorGrid.appendChild(card);
+            });
+        }
+
+        function saveThemeSettings() {
+            appData.themeSettings = {
+                paletteId: selectedThemeId,
+                icon: selectedAppIcon
+            };
+            saveAppData();
+            applyTheme();
+            closeModal('themeModal');
+            showToast("Tetapan warna dan ikon aplikasi berjaya disimpan!");
         }
 
         function saveAppData() {
