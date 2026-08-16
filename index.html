@@ -1,0 +1,2348 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#4f46e5">
+    <title>Beg Sekolah - Pengurusan Jadual . Beg Sekolah . Ko-Kurikulum</title>
+    <!-- Font & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --primary-light: #eeefef;
+            --secondary: #06b6d4;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --card-border: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -1px rgba(0,0,0,0.04);
+            --shadow-lg: 0 10px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.5;
+            padding-bottom: 40px;
+        }
+
+        button, input, select, textarea {
+            font-family: inherit;
+        }
+
+        /* HEADER */
+        .header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 16px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            box-shadow: 0 4px 20px rgba(79, 70, 229, 0.25);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-logo {
+            width: 44px;
+            height: 44px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(8px);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .brand-text h1 {
+            font-size: 1.15rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .brand-text p {
+            font-size: 0.75rem;
+            opacity: 0.85;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* LAYOUT */
+        .main-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 16px;
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* CARDS */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-sm);
+            transition: box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-main);
+        }
+
+        /* BUTTONS */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            border: none;
+            border-radius: var(--radius-md);
+            padding: 10px 16px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-hover); }
+
+        .btn-secondary { background: #eef2ff; color: #3730a3; }
+        .btn-secondary:hover { background: #e0e7ff; }
+
+        .btn-success { background: #dcfce7; color: #166534; }
+        .btn-success:hover { background: #bbf7d0; }
+
+        .btn-danger { background: #fee2e2; color: #991b1b; }
+        .btn-danger:hover { background: #fca5a5; }
+
+        .btn-light { background: #f1f5f9; color: #334155; }
+        .btn-light:hover { background: #e2e8f0; }
+
+        .btn-sm {
+            padding: 6px 10px;
+            font-size: 0.775rem;
+            border-radius: var(--radius-sm);
+        }
+
+        .btn-full { width: 100%; }
+
+        /* STUDENTS LIST */
+        .student-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .student-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: var(--radius-md);
+            border: 2px solid var(--card-border);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: #fafafa;
+        }
+
+        .student-card.active {
+            border-color: var(--primary);
+            background: #eef2ff;
+        }
+
+        .student-avatar-box {
+            position: relative;
+            width: 44px;
+            height: 44px;
+            flex-shrink: 0;
+        }
+
+        .student-avatar-img {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .student-avatar-fallback {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .student-details {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .student-details strong {
+            display: block;
+            font-size: 0.95rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .student-details small {
+            color: var(--text-muted);
+            font-size: 0.775rem;
+        }
+
+        .student-actions {
+            display: flex;
+            gap: 4px;
+        }
+
+        /* HERO STATS */
+        .hero-banner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .greeting-box {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .greeting-avatar {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--primary-light);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .greeting h2 {
+            font-size: 1.4rem;
+            font-weight: 800;
+        }
+
+        .greeting p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px;
+        }
+
+        .stat-box {
+            background: #f8fafc;
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            padding: 14px;
+            text-align: left;
+        }
+
+        .stat-box .icon {
+            font-size: 1.3rem;
+            margin-bottom: 4px;
+        }
+
+        .stat-box label {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .stat-box val {
+            display: block;
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        /* DAY SELECTOR TABS */
+        .days-tab {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 6px;
+            scrollbar-width: thin;
+        }
+
+        .day-btn {
+            flex: 1;
+            min-width: 80px;
+            padding: 10px 6px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--card-border);
+            background: white;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .day-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+
+        .day-btn strong {
+            display: block;
+            font-size: 0.85rem;
+        }
+
+        .day-btn small {
+            font-size: 0.7rem;
+            opacity: 0.8;
+        }
+
+        /* SCHEDULE & COCURRICULAR ITEMS */
+        .schedule-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .schedule-card {
+            border: 1px solid var(--card-border);
+            border-left: 6px solid var(--primary);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            background: white;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .schedule-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .schedule-card.type-kokurikulum { border-left-color: #ec4899; }
+        .schedule-card.type-peperiksaan { border-left-color: #ef4444; }
+        .schedule-card.type-aktiviti { border-left-color: #f59e0b; }
+
+        .cocurricular-card {
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            background: #fafafa;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            transition: box-shadow 0.2s ease;
+        }
+
+        .cocurricular-card:hover {
+            box-shadow: var(--shadow-sm);
+            background: white;
+        }
+
+        .cocurricular-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 999px;
+            text-transform: uppercase;
+        }
+
+        .badge-uniform { background: #fce7f3; color: #9d174d; }
+        .badge-sukan { background: #dbeafe; color: #1e40af; }
+        .badge-persatuan { background: #fef3c7; color: #92400e; }
+
+        .schedule-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .subject-title {
+            font-size: 1.1rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .time-badge {
+            background: #eef2ff;
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 0.8rem;
+            padding: 4px 10px;
+            border-radius: 999px;
+            white-space: nowrap;
+        }
+
+        .schedule-note {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 6px;
+        }
+
+        .books-tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 10px;
+        }
+
+        .book-tag {
+            background: #f1f5f9;
+            color: #334155;
+            font-size: 0.775rem;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .schedule-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1px dashed var(--card-border);
+        }
+
+        /* BAG CHECKLIST */
+        .progress-bar-bg {
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 999px;
+            overflow: hidden;
+            margin-bottom: 14px;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--success);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .bag-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 10px;
+        }
+
+        .bag-item {
+            padding: 12px;
+            border-radius: var(--radius-md);
+            background: #f8fafc;
+            border: 1px solid var(--card-border);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .bag-item.packed {
+            background: #dcfce7;
+            border-color: #86efac;
+        }
+
+        .bag-item label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            font-size: 0.875rem;
+            cursor: pointer;
+        }
+
+        .bag-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--success);
+            cursor: pointer;
+        }
+
+        /* HOMEWORK SECTION */
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            background: white;
+        }
+
+        .task-item.completed {
+            opacity: 0.6;
+            text-decoration: line-through;
+        }
+
+        /* NEARBY SCHOOLS */
+        .school-card {
+            padding: 12px;
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            margin-top: 8px;
+            background: #fafafa;
+        }
+
+        .school-card h4 {
+            font-size: 0.95rem;
+            color: var(--text-main);
+        }
+
+        .school-card p {
+            font-size: 0.775rem;
+            color: var(--text-muted);
+            margin: 2px 0 8px 0;
+        }
+
+        .school-links {
+            display: flex;
+            gap: 6px;
+        }
+
+        /* AVATAR UPLOAD CONTAINER */
+        .avatar-picker {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 14px;
+        }
+
+        .avatar-preview {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            overflow: hidden;
+            border: 2px solid var(--card-border);
+        }
+
+        .avatar-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* MODALS */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            z-index: 100;
+        }
+
+        .modal-backdrop.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--radius-lg);
+            width: min(550px, 100%);
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 24px;
+            box-shadow: var(--shadow-lg);
+            animation: modalIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .modal-header h3 {
+            font-size: 1.2rem;
+            font-weight: 800;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 14px;
+        }
+
+        .form-group label {
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--text-main);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 10px 12px;
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        @media (max-width: 500px) {
+            .form-row { grid-template-columns: 1fr; }
+        }
+
+        /* EMPTY STATE */
+        .empty-box {
+            text-align: center;
+            padding: 30px 16px;
+            color: var(--text-muted);
+        }
+
+        .empty-box .icon {
+            font-size: 3rem;
+            margin-bottom: 8px;
+        }
+
+        .empty-box h4 {
+            color: var(--text-main);
+            font-size: 1rem;
+            margin-bottom: 4px;
+        }
+
+        /* TOAST */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--text-main);
+            color: white;
+            padding: 12px 20px;
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            font-weight: 600;
+            box-shadow: var(--shadow-lg);
+            display: none;
+            z-index: 200;
+            animation: toastIn 0.3s ease;
+        }
+
+        .toast.show {
+            display: block;
+        }
+
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .badge-count {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-container">
+            <div class="brand">
+                <div class="brand-logo">🎒</div>
+                <div class="brand-text">
+                    <h1>Beg Sekolah</h1>
+                    <p>Pengurusan Jadual dan Aktiviti Ko-Kurikulum</p>
+                </div>
+            </div>
+
+            <div class="header-actions">
+                <button class="btn btn-light btn-sm" onclick="openStudentModal()">
+                    👦 Pelajar
+                </button>
+                <button class="btn btn-light btn-sm" onclick="enableNotifications()">
+                    🔔 Notifikasi
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="main-container">
+
+        <!-- SIDEBAR -->
+        <aside>
+            <!-- PELAJAR CARD -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">👨‍👩‍👧 Pelajar</span>
+                    <button class="btn btn-primary btn-sm" onclick="openStudentModal()">＋ Tambah</button>
+                </div>
+                <div id="studentListContainer" class="student-list"></div>
+            </div>
+
+            <!-- CARI SEKOLAH BERDEKATAN -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">🏫 Sekolah Berdekatan</span>
+                </div>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">
+                    Cari sekolah rendah/menengah berhampiran anda mengikut lokasi peranti.
+                </p>
+                <button class="btn btn-secondary btn-full" onclick="findSchoolsNearMe()">
+                    📍 Cari Sekolah Berhampiran
+                </button>
+                <div id="schoolStatus" style="font-size: 0.8rem; margin-top: 10px; color: var(--text-muted);"></div>
+                <div id="schoolResults"></div>
+            </div>
+
+            <!-- DATA MANAGEMENT -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">⚙️ Data & Tetapan</span>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <button class="btn btn-light btn-full" onclick="loadSampleData()">
+                        🪄 Muat Data Contoh
+                    </button>
+                    <button class="btn btn-light btn-full" onclick="exportAppData()">
+                        📤 Eksport Backup (JSON)
+                    </button>
+                    <button class="btn btn-light btn-full" onclick="document.getElementById('importFileInput').click()">
+                        📥 Import Backup
+                    </button>
+                    <input type="file" id="importFileInput" accept=".json" style="display:none" onchange="importAppData(event)">
+                </div>
+            </div>
+        </aside>
+
+        <!-- CONTENT AREA (UTAMAKAN JADUAL SEKOLAH) -->
+        <section>
+            <!-- HERO WELCOME & STATS -->
+            <div class="card">
+                <div class="hero-banner">
+                    <div class="greeting-box">
+                        <div id="greetingAvatarBox"></div>
+                        <div class="greeting">
+                            <h2 id="greetingName">Hai! 👋</h2>
+                            <p id="currentFullDate">Isnin, 1 Januari</p>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="openScheduleModal()">
+                        📚 ＋ Tambah Subjek
+                    </button>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="icon">📚</div>
+                        <label>Jadual Hari Ini</label>
+                        <val id="statScheduleCount">0</val>
+                    </div>
+                    <div class="stat-box">
+                        <div class="icon">📖</div>
+                        <label>Buku / Barang Siap</label>
+                        <val id="statBooksCount">0</val>
+                    </div>
+                    <div class="stat-box">
+                        <div class="icon">🎒</div>
+                        <label>Siap Pack Beg</label>
+                        <val id="statPackedCount">0</val>
+                    </div>
+                    <div class="stat-box">
+                        <div class="icon">⏰</div>
+                        <label>Masa Mula</label>
+                        <val id="statFirstClassTime">-</val>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB HARI MINGGUAN -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">📅 Jadual Waktu Mingguan</span>
+                </div>
+                <div id="daysTab" class="days-tab"></div>
+            </div>
+
+            <!-- SENARAI JADUAL HARI INI (UTAMA) -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title" id="selectedDayHeader">Jadual Hari Ini</span>
+                    <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                        <button class="btn btn-secondary btn-sm" onclick="openCopyDayModal()">📋 Salin Hari Ini</button>
+                        <button class="btn btn-primary btn-sm" onclick="openScheduleModal()">＋ Tambah Subjek</button>
+                    </div>
+                </div>
+                <div id="scheduleContainer" class="schedule-list"></div>
+            </div>
+
+            <!-- CHECKLIST BEK SEKOLAH -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">🎒 Beg Saya (Checklist Buku & Keperluan)</span>
+                    <button class="btn btn-success btn-sm" onclick="packAllBooks()">
+                        ✅ Tanda Semua Siap
+                    </button>
+                </div>
+                <p style="font-size: 0.825rem; color: var(--text-muted); margin-bottom: 10px;">
+                    Semak dan pastikan semua buku subjek serta barangan sekolah hari ini dimasukkan ke dalam beg.
+                </p>
+                <div class="progress-bar-bg">
+                    <div id="bagProgressBar" class="progress-bar-fill"></div>
+                </div>
+                <div id="bagGrid" class="bag-grid"></div>
+            </div>
+
+            <!-- SENARAI TUGASAN / KERJA RUMAH -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">📝 Kerja Rumah & Tugasan</span>
+                    <button class="btn btn-secondary btn-sm" onclick="openTaskModal()">＋ Tambah Tugasan</button>
+                </div>
+                <div id="taskList" class="task-list"></div>
+            </div>
+
+            <!-- KOKURIKULUM, SUKAN & PERSATUAN -->
+            <div class="card" style="opacity: 0.95; border-style: dashed;">
+                <div class="card-header">
+                    <span class="card-title" style="color: var(--text-muted);">🏃 Kokurikulum, Sukan & Persatuan</span>
+                    <button class="btn btn-light btn-sm" onclick="openCocurricularModal()">＋ Tambah Aktiviti</button>
+                </div>
+                <p style="font-size: 0.825rem; color: var(--text-muted); margin-bottom: 14px;">
+                    Pendaftaran aktiviti: Unit Beruniform, Sukan & Permainan, serta Kelab/Persatuan.
+                </p>
+                <div id="cocurricularContainer" style="display: flex; flex-direction: column; gap: 12px;"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODAL: PELAJAR -->
+    <div class="modal-backdrop" id="studentModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="studentModalTitle">👦 Profil Pelajar</h3>
+                <button class="btn btn-light btn-sm" onclick="closeModal('studentModal')">✕</button>
+            </div>
+            <form onsubmit="saveStudentForm(event)">
+                <input type="hidden" id="studentEditId">
+
+                <!-- GAMBAR PROFIL AVATAR -->
+                <div class="avatar-picker">
+                    <div id="avatarPreviewBox" class="avatar-preview">👤</div>
+                    <div>
+                        <label style="font-size:0.85rem; font-weight:700; display:block; margin-bottom:4px;">Gambar Profil Pelajar</label>
+                        <input type="file" id="studentAvatarFile" accept="image/*" onchange="previewStudentAvatar(event)" style="font-size:0.8rem;">
+                        <input type="hidden" id="studentAvatarBase64">
+                        <small style="display:block; color:var(--text-muted); margin-top:4px;">Muat naik gambar profil (Opsional)</small>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Nama Pelajar / Anak</label>
+                    <input type="text" id="studentName" required placeholder="Contoh: Amirul Hafiz">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Tahun / Tingkatan</label>
+                        <input type="text" id="studentLevel" placeholder="Contoh: Tahun 4 Cemerlang">
+                    </div>
+                    <div class="form-group">
+                        <label>Nama Sekolah</label>
+                        <input type="text" id="studentSchool" placeholder="Contoh: SK Taman Melawati">
+                    </div>
+                </div>
+                <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px;">
+                    <button type="button" class="btn btn-light" onclick="closeModal('studentModal')">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan Pelajar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: JADUAL / SUBJEK -->
+    <div class="modal-backdrop" id="scheduleModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="scheduleModalTitle">📚 Tambah Subjek</h3>
+                <button class="btn btn-light btn-sm" onclick="closeModal('scheduleModal')">✕</button>
+            </div>
+            <form onsubmit="saveScheduleForm(event)">
+                <input type="hidden" id="scheduleEditId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Hari</label>
+                        <select id="scheduleDay" required>
+                            <option value="1">Isnin</option>
+                            <option value="2">Selasa</option>
+                            <option value="3">Rabu</option>
+                            <option value="4">Khamis</option>
+                            <option value="5">Jumaat</option>
+                            <option value="6">Sabtu</option>
+                            <option value="0">Ahad</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Jenis Aktiviti</label>
+                        <select id="scheduleType">
+                            <option value="subjek">📚 Subjek Akademik</option>
+                            <option value="peperiksaan">📝 Peperiksaan / Ujian</option>
+                            <option value="aktiviti">🎯 Aktiviti Khas</option>
+                        </select>
+                    </div>
+                </div>
+
+    <!-- MODAL: SALIN JADUAL HARI -->
+    <div class="modal-backdrop" id="copyDayModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📋 Salin Jadual Waktu Hari Ini</h3>
+                <button class="btn btn-light btn-sm" onclick="closeModal('copyDayModal')">✕</button>
+            </div>
+            <form onsubmit="executeCopyDay(event)">
+                <p style="font-size:0.875rem; color: var(--text-muted); margin-bottom:14px;">
+                    Salin kesemua subjek dari hari <strong id="copySourceDayName" style="color:var(--primary);">Isnin</strong> ke hari-hari lain:
+                </p>
+
+                <div class="form-group">
+                    <label>Pilih Hari Sasaran:</label>
+                    <div id="targetDaysContainer" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap:8px; margin-top:8px;">
+                        <!-- Options generated dynamically -->
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top:10px;">
+                    <label style="font-weight: normal; font-size: 0.85rem; display:flex; align-items:center; gap:8px; cursor:pointer;">
+                        <input type="checkbox" id="overwriteTargetDays" style="width:16px; height:16px; accent-color:var(--primary);">
+                        <span>Gantikan (padam) jadual sedia ada pada hari sasaran</span>
+                    </label>
+                </div>
+
+                <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px;">
+                    <button type="button" class="btn btn-light" onclick="closeModal('copyDayModal')">Batal</button>
+                    <button type="submit" class="btn btn-primary">Salin Jadual</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: KOKURIKULUM, SUKAN & PERSATUAN -->
+    <div class="modal-backdrop" id="cocurricularModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="cocoModalTitle">🏃 Tambah Aktiviti Kokurikulum</h3>
+                <button class="btn btn-light btn-sm" onclick="closeModal('cocurricularModal')">✕</button>
+            </div>
+            <form onsubmit="saveCocurricularForm(event)">
+                <input type="hidden" id="cocoEditId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Kategori Kokurikulum</label>
+                        <select id="cocoCategory" required>
+                            <option value="uniform">⛺ Unit Beruniform</option>
+                            <option value="sukan">⚽ Sukan & Permainan</option>
+                            <option value="persatuan">🎨 Kelab & Persatuan</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Hari Perjumpaan</label>
+                        <select id="cocoDay" required>
+                            <option value="1">Isnin</option>
+                            <option value="2">Selasa</option>
+                            <option value="3" selected>Rabu</option>
+                            <option value="4">Khamis</option>
+                            <option value="5">Jumaat</option>
+                            <option value="6">Sabtu</option>
+                            <option value="0">Ahad</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Nama Kelab / Sukan / Unit Beruniform</label>
+                    <input type="text" id="cocoName" required placeholder="Contoh: Pengakap Kanak-Kanak / Kelab STEM / Kelab Bola Sepak">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Masa Mula</label>
+                        <input type="time" id="cocoStart" required value="14:30">
+                    </div>
+                    <div class="form-group">
+                        <label>Masa Tamat</label>
+                        <input type="time" id="cocoEnd" value="16:30">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Pakaian / Uniform Perlu Dipakai</label>
+                        <input type="text" id="cocoUniform" placeholder="Contoh: Uniform Lengkap Pengakap / Baju T-Sukan">
+                    </div>
+                    <div class="form-group">
+                        <label>Jawatan / Peranan</label>
+                        <input type="text" id="cocoRole" placeholder="Contoh: Ahli / Pengerusi / AJK">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Tempat Perjumpaan / Lokasi</label>
+                    <input type="text" id="cocoLocation" placeholder="Contoh: Padang Sekolah / Dewan Utama / Makmal Komputer">
+                </div>
+
+                <div class="form-group">
+                    <label>Peralatan & Barangan Keperluan (Koma-separated)</label>
+                    <input type="text" id="cocoItems" placeholder="Contoh: Buku Log Pengakap, Tali Rotan, Kasut Sukan, Raket Badminton">
+                </div>
+
+                <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px;">
+                    <button type="button" class="btn btn-light" onclick="closeModal('cocurricularModal')">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan Aktiviti</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: TUGASAN / KERJA RUMAH -->
+    <div class="modal-backdrop" id="taskModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📝 Tambah Kerja Rumah / Tugasan</h3>
+                <button class="btn btn-light btn-sm" onclick="closeModal('taskModal')">✕</button>
+            </div>
+            <form onsubmit="saveTaskForm(event)">
+                <div class="form-group">
+                    <label>Subjek / Tajuk Tugasan</label>
+                    <input type="text" id="taskTitle" required placeholder="Contoh: Latihan Matematik M/S 45">
+                </div>
+                <div class="form-group">
+                    <label>Tarikh Hantar / Due Date</label>
+                    <input type="date" id="taskDueDate" required>
+                </div>
+                <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px;">
+                    <button type="button" class="btn btn-light" onclick="closeModal('taskModal')">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan Tugasan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: CONFIRMATION DIALOG -->
+    <div class="modal-backdrop" id="confirmModal">
+        <div class="modal-content" style="max-width: 400px; text-align: center;">
+            <div style="font-size: 3rem; margin-bottom: 8px;">⚠️</div>
+            <h3 id="confirmTitle" style="margin-bottom: 8px;">Pengesahan</h3>
+            <p id="confirmMessage" style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">Adakah anda pasti?</p>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button class="btn btn-light" onclick="closeModal('confirmModal')">Batal</button>
+                <button id="confirmActionButton" class="btn btn-danger">Teruskan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="toast"></div>
+
+    <script>
+        /* ============================================================
+           STATE MANAGEMENT
+        ============================================================ */
+        const DAYS = [
+            { id: 1, name: "Isnin", short: "ISN" },
+            { id: 2, name: "Selasa", short: "SEL" },
+            { id: 3, name: "Rabu", short: "RAB" },
+            { id: 4, name: "Khamis", short: "KHA" },
+            { id: 5, name: "Jumaat", short: "JUM" },
+            { id: 6, name: "Sabtu", short: "SAB" },
+            { id: 0, name: "Ahad", short: "AHD" }
+        ];
+
+        let state = JSON.parse(localStorage.getItem("beg_sekolah_db")) || {
+            students: [],
+            schedules: [],
+            cocurricular: [],
+            tasks: [],
+            activeStudentId: null,
+            packedBooks: {}
+        };
+
+        let activeDay = new Date().getDay();
+
+        if (!state.activeStudentId && state.students.length > 0) {
+            state.activeStudentId = state.students[0].id;
+        }
+
+        if (!state.cocurricular) {
+            state.cocurricular = [];
+        }
+
+        saveState();
+
+        document.addEventListener("DOMContentLoaded", () => {
+            renderAll();
+            startReminderTimer();
+        });
+
+        function saveState() {
+            localStorage.setItem("beg_sekolah_db", JSON.stringify(state));
+        }
+
+        function generateId() {
+            return 'id_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        function getActiveStudent() {
+            return state.students.find(s => s.id === state.activeStudentId);
+        }
+
+        /* ============================================================
+           RENDER FUNCTIONS
+        ============================================================ */
+        function renderAll() {
+            renderStudents();
+            renderHeroStats();
+            renderDaysTabs();
+            renderScheduleList();
+            renderCocurricularList();
+            renderBagChecklist();
+            renderTaskList();
+        }
+
+        function renderStudents() {
+            const container = document.getElementById("studentListContainer");
+            if (!state.students.length) {
+                container.innerHTML = `
+                    <div class="empty-box" style="padding: 15px 0;">
+                        <div style="font-size:1.8rem;">👦</div>
+                        <p style="font-size:0.8rem; margin-top:4px;">Belum ada pelajar direkodkan.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = state.students.map(student => {
+                const isSelected = student.id === state.activeStudentId;
+                const avatarHtml = student.avatarData 
+                    ? `<img src="${student.avatarData}" class="student-avatar-img" alt="Avatar">`
+                    : `<div class="student-avatar-fallback">${student.name.charAt(0).toUpperCase()}</div>`;
+
+                return `
+                    <div class="student-card ${isSelected ? 'active' : ''}" onclick="switchStudent('${student.id}')">
+                        <div class="student-avatar-box">${avatarHtml}</div>
+                        <div class="student-details">
+                            <strong>${escapeHtml(student.name)}</strong>
+                            <small>${escapeHtml(student.level || 'Pelajar')} ${student.school ? '• ' + escapeHtml(student.school) : ''}</small>
+                        </div>
+                        <div class="student-actions">
+                            <button class="btn btn-light btn-sm" onclick="event.stopPropagation(); openEditStudentModal('${student.id}')" title="Edit Profil">✏️</button>
+                            <button class="btn btn-light btn-sm" onclick="event.stopPropagation(); openConfirmDeleteStudent('${student.id}')" title="Padam">🗑</button>
+                        </div>
+                    </div>
+                `;
+            }).join("");
+        }
+
+        function renderHeroStats() {
+            const student = getActiveStudent();
+            const now = new Date();
+            
+            document.getElementById("currentFullDate").textContent = now.toLocaleDateString("ms-MY", {
+                weekday: "long", day: "numeric", month: "long", year: "numeric"
+            });
+
+            document.getElementById("greetingName").textContent = student ? `Hai, ${student.name}! 👋` : "Selamat datang! 👋";
+
+            const avatarContainer = document.getElementById("greetingAvatarBox");
+            if (student && student.avatarData) {
+                avatarContainer.innerHTML = `<img src="${student.avatarData}" class="greeting-avatar" alt="Profil">`;
+            } else if (student) {
+                avatarContainer.innerHTML = `<div class="student-avatar-fallback" style="width:52px; height:52px; font-size:1.4rem;">${student.name.charAt(0).toUpperCase()}</div>`;
+            } else {
+                avatarContainer.innerHTML = ``;
+            }
+
+            const studentSchedules = getStudentSchedulesForDay(activeDay);
+            const booksNeeded = getBooksForDay(activeDay);
+            const packedCount = booksNeeded.filter(b => b.packed).length;
+
+            document.getElementById("statScheduleCount").textContent = studentSchedules.length;
+            document.getElementById("statBooksCount").textContent = booksNeeded.length;
+            document.getElementById("statPackedCount").textContent = packedCount;
+            document.getElementById("statFirstClassTime").textContent = studentSchedules.length > 0 ? studentSchedules[0].start : "-";
+        }
+
+        function renderDaysTabs() {
+            const container = document.getElementById("daysTab");
+            container.innerHTML = DAYS.map(day => {
+                const scheduleCount = getStudentSchedulesForDay(day.id).length;
+                return `
+                    <div class="day-btn ${activeDay === day.id ? 'active' : ''}" onclick="switchDay(${day.id})">
+                        <strong>${day.name}</strong>
+                        <small>${scheduleCount} subjek</small>
+                    </div>
+                `;
+            }).join("");
+        }
+
+        function getStudentSchedulesForDay(dayId) {
+            const student = getActiveStudent();
+            if (!student) return [];
+            return state.schedules
+                .filter(s => s.studentId === student.id && Number(s.day) === dayId)
+                .sort((a, b) => a.start.localeCompare(b.start));
+        }
+
+        function getStudentCocurricular() {
+            const student = getActiveStudent();
+            if (!student) return [];
+            return (state.cocurricular || []).filter(c => c.studentId === student.id);
+        }
+
+        function getStudentCocurricularForDay(dayId) {
+            return getStudentCocurricular()
+                .filter(c => Number(c.day) === dayId)
+                .sort((a, b) => (a.start || "").localeCompare(b.start || ""));
+        }
+
+        function renderScheduleList() {
+            const schedules = getStudentSchedulesForDay(activeDay);
+            const dayName = DAYS.find(d => d.id === activeDay)?.name || "";
+            document.getElementById("selectedDayHeader").textContent = `📅 Jadual Hari ${dayName}`;
+
+            const container = document.getElementById("scheduleContainer");
+
+            if (!getActiveStudent()) {
+                container.innerHTML = `
+                    <div class="empty-box">
+                        <div class="icon">👨‍👩‍👧</div>
+                        <h4>Sila Tambah Pelajar</h4>
+                        <p>Klik butang 'Tambah Pelajar' di sebelah kiri untuk bermula.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            if (!schedules.length) {
+                container.innerHTML = `
+                    <div class="empty-box">
+                        <div class="icon">🎉</div>
+                        <h4>Tiada Subjek Rekod</h4>
+                        <p>Tiada jadual waktu sekolah dimasukkan untuk hari ${dayName}. Anda boleh tekan 'Salin Hari Ini' dari hari lain.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = schedules.map(item => `
+                <div class="schedule-card type-${item.type || 'subjek'}">
+                    <div class="schedule-header">
+                        <div>
+                            <div class="subject-title">
+                                ${getTypeEmoji(item.type)} ${escapeHtml(item.subject)}
+                            </div>
+                            ${item.note ? `<div class="schedule-note">💡 ${escapeHtml(item.note)}</div>` : ''}
+                        </div>
+                        <div class="time-badge">
+                            ⏰ ${item.start} ${item.end ? '- ' + item.end : ''}
+                        </div>
+                    </div>
+                    ${item.books && item.books.length > 0 ? `
+                        <div class="books-tag-list">
+                            ${item.books.map(b => `<span class="book-tag">📖 ${escapeHtml(b)}</span>`).join("")}
+                        </div>
+                    ` : ''}
+                    <div class="schedule-actions">
+                        <button class="btn btn-light btn-sm" onclick="duplicateSchedule('${item.id}')">📋 Duplikasi</button>
+                        <button class="btn btn-light btn-sm" onclick="editSchedule('${item.id}')">✏️ Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="openConfirmDeleteSchedule('${item.id}')">🗑 Padam</button>
+                    </div>
+                </div>
+            `).join("");
+        }
+
+        function renderCocurricularList() {
+            const container = document.getElementById("cocurricularContainer");
+            const allCoco = getStudentCocurricular();
+
+            if (!getActiveStudent()) {
+                container.innerHTML = `<div class="empty-box"><p>Sila tambah/pilih pelajar dahulu.</p></div>`;
+                return;
+            }
+
+            if (!allCoco.length) {
+                container.innerHTML = `
+                    <div class="empty-box" style="padding: 15px 0;">
+                        <p style="font-size:0.85rem;">Tiada aktiviti kokurikulum didaftarkan.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = allCoco.map(item => {
+                const dayName = DAYS.find(d => d.id === Number(item.day))?.name || "";
+                let badgeClass = "badge-persatuan";
+                let badgeIcon = "🎨 Kelab / Persatuan";
+
+                if (item.category === 'uniform') {
+                    badgeClass = "badge-uniform";
+                    badgeIcon = "⛺ Unit Beruniform";
+                } else if (item.category === 'sukan') {
+                    badgeClass = "badge-sukan";
+                    badgeIcon = "⚽ Sukan & Permainan";
+                }
+
+                return `
+                    <div class="cocurricular-card">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:8px;">
+                            <div>
+                                <span class="cocurricular-badge ${badgeClass}">${badgeIcon}</span>
+                                <h4 style="font-size:1rem; font-weight:800; margin-top:4px;">${escapeHtml(item.name)}</h4>
+                            </div>
+                            <div class="time-badge">
+                                📅 ${dayName} ${item.start ? '• ' + item.start : ''}
+                            </div>
+                        </div>
+
+                        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap:6px; font-size:0.8rem; color: var(--text-muted);">
+                            ${item.uniform ? `<div>👔 <strong>Uniform:</strong> ${escapeHtml(item.uniform)}</div>` : ''}
+                            ${item.location ? `<div>📍 <strong>Lokasi:</strong> ${escapeHtml(item.location)}</div>` : ''}
+                        </div>
+
+                        ${item.items && item.items.length > 0 ? `
+                            <div class="books-tag-list">
+                                ${item.items.map(gear => `<span class="book-tag" style="background:#e0f2fe; color:#0369a1;">🎒 ${escapeHtml(gear)}</span>`).join("")}
+                            </div>
+                        ` : ''}
+
+                        <div class="schedule-actions" style="margin-top:4px; padding-top:4px;">
+                            <button class="btn btn-light btn-sm" onclick="editCocurricular('${item.id}')">✏️ Edit</button>
+                            <button class="btn btn-danger btn-sm" onclick="openConfirmDeleteCocurricular('${item.id}')">🗑 Padam</button>
+                        </div>
+                    </div>
+                `;
+            }).join("");
+        }
+
+        function getBooksForDay(dayId) {
+            const schedules = getStudentSchedulesForDay(dayId);
+            const cocos = getStudentCocurricularForDay(dayId);
+            const student = getActiveStudent();
+            if (!student) return [];
+
+            const booksMap = [];
+
+            schedules.forEach(s => {
+                if (s.books && Array.isArray(s.books)) {
+                    s.books.forEach(b => {
+                        const key = `${student.id}_${s.id}_${b}`;
+                        booksMap.push({
+                            key: key,
+                            scheduleId: s.id,
+                            name: b,
+                            subject: s.subject,
+                            type: 'buku',
+                            packed: !!state.packedBooks[key]
+                        });
+                    });
+                }
+            });
+
+            cocos.forEach(c => {
+                if (c.uniform) {
+                    const uniformKey = `${student.id}_coco_${c.id}_uniform`;
+                    booksMap.push({
+                        key: uniformKey,
+                        scheduleId: c.id,
+                        name: `👔 ${c.uniform}`,
+                        subject: c.name,
+                        type: 'koko',
+                        packed: !!state.packedBooks[uniformKey]
+                    });
+                }
+                if (c.items && Array.isArray(c.items)) {
+                    c.items.forEach(gear => {
+                        const gearKey = `${student.id}_coco_${c.id}_${gear}`;
+                        booksMap.push({
+                            key: gearKey,
+                            scheduleId: c.id,
+                            name: gear,
+                            subject: c.name,
+                            type: 'koko',
+                            packed: !!state.packedBooks[gearKey]
+                        });
+                    });
+                }
+            });
+
+            return booksMap;
+        }
+
+        function renderBagChecklist() {
+            const books = getBooksForDay(activeDay);
+            const container = document.getElementById("bagGrid");
+            const progressBar = document.getElementById("bagProgressBar");
+
+            if (!books.length) {
+                container.innerHTML = `<div class="empty-box" style="grid-column: 1/-1;"><p>Tiada buku diperlukan untuk hari ini.</p></div>`;
+                progressBar.style.width = '0%';
+                return;
+            }
+
+            const packedCount = books.filter(b => b.packed).length;
+            const percentage = Math.round((packedCount / books.length) * 100);
+            progressBar.style.width = `${percentage}%`;
+
+            container.innerHTML = books.map(book => `
+                <div class="bag-item ${book.packed ? 'packed' : ''}">
+                    <label>
+                        <input type="checkbox" ${book.packed ? 'checked' : ''} onchange="toggleBookPacked('${escapeAttribute(book.key)}')">
+                        <span>${escapeHtml(book.name)}</span>
+                    </label>
+                    <span style="font-size:0.75rem; color: var(--text-muted);">${book.type === 'koko' ? '🏃 Kokurikulum' : '📚 Subjek'}: ${escapeHtml(book.subject)}</span>
+                </div>
+            `).join("");
+        }
+
+        function toggleBookPacked(key) {
+            state.packedBooks[key] = !state.packedBooks[key];
+            saveState();
+            renderHeroStats();
+            renderBagChecklist();
+        }
+
+        function packAllBooks() {
+            const books = getBooksForDay(activeDay);
+            if (!books.length) return;
+
+            books.forEach(b => {
+                state.packedBooks[b.key] = true;
+            });
+            saveState();
+            renderHeroStats();
+            renderBagChecklist();
+            showToast("Semua buku & barangan untuk hari ini ditandakan siap! 🎒");
+        }
+
+        function renderTaskList() {
+            const student = getActiveStudent();
+            const container = document.getElementById("taskList");
+
+            if (!student) {
+                container.innerHTML = `<div class="empty-box"><p>Sila tambah/pilih pelajar dahulu.</p></div>`;
+                return;
+            }
+
+            const studentTasks = (state.tasks || []).filter(t => t.studentId === student.id);
+
+            if (!studentTasks.length) {
+                container.innerHTML = `<div class="empty-box" style="padding:15px;"><p>Tiada kerja rumah atau tugasan belum selesai. 🎉</p></div>`;
+                return;
+            }
+
+            container.innerHTML = studentTasks.map(t => `
+                <div class="task-item ${t.completed ? 'completed' : ''}">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <input type="checkbox" ${t.completed ? 'checked' : ''} onchange="toggleTaskDone('${t.id}')" style="width:18px; height:18px; accent-color:var(--primary);">
+                        <div>
+                            <strong>${escapeHtml(t.title)}</strong>
+                            <div style="font-size:0.75rem; color:var(--text-muted);">Tarikh Hantar: ${t.dueDate}</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-light btn-sm" onclick="deleteTask('${t.id}')">🗑</button>
+                </div>
+            `).join("");
+        }
+
+        function toggleTaskDone(taskId) {
+            const task = state.tasks.find(t => t.id === taskId);
+            if (task) {
+                task.completed = !task.completed;
+                saveState();
+                renderTaskList();
+            }
+        }
+
+        function deleteTask(taskId) {
+            state.tasks = state.tasks.filter(t => t.id !== taskId);
+            saveState();
+            renderTaskList();
+            showToast("Tugasan dipadam.");
+        }
+
+        /* ============================================================
+           STUDENT ACTIONS & AVATAR HANDLING
+        ============================================================ */
+        function openStudentModal() {
+            document.getElementById("studentEditId").value = "";
+            document.getElementById("studentName").value = "";
+            document.getElementById("studentLevel").value = "";
+            document.getElementById("studentSchool").value = "";
+            document.getElementById("studentAvatarBase64").value = "";
+            document.getElementById("studentAvatarFile").value = "";
+            document.getElementById("avatarPreviewBox").innerHTML = "👤";
+            document.getElementById("studentModalTitle").textContent = "👦 Tambah Pelajar Baru";
+            showModal("studentModal");
+        }
+
+        function openEditStudentModal(id) {
+            const student = state.students.find(s => s.id === id);
+            if (!student) return;
+
+            document.getElementById("studentEditId").value = student.id;
+            document.getElementById("studentName").value = student.name;
+            document.getElementById("studentLevel").value = student.level || "";
+            document.getElementById("studentSchool").value = student.school || "";
+            document.getElementById("studentAvatarBase64").value = student.avatarData || "";
+            document.getElementById("studentAvatarFile").value = "";
+
+            const preview = document.getElementById("avatarPreviewBox");
+            if (student.avatarData) {
+                preview.innerHTML = `<img src="${student.avatarData}" alt="Avatar">`;
+            } else {
+                preview.innerHTML = student.name.charAt(0).toUpperCase();
+            }
+
+            document.getElementById("studentModalTitle").textContent = "✏️ Edit Profil Pelajar";
+            showModal("studentModal");
+        }
+
+        function previewStudentAvatar(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement("canvas");
+                    const ctx = canvas.getContext("2d");
+                    const maxDim = 200;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > maxDim) {
+                            height *= maxDim / width;
+                            width = maxDim;
+                        }
+                    } else {
+                        if (height > maxDim) {
+                            width *= maxDim / height;
+                            height = maxDim;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    const compressedBase64 = canvas.toDataURL("image/jpeg", 0.85);
+                    document.getElementById("studentAvatarBase64").value = compressedBase64;
+                    document.getElementById("avatarPreviewBox").innerHTML = `<img src="${compressedBase64}" alt="Avatar">`;
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function saveStudentForm(event) {
+            event.preventDefault();
+            const editId = document.getElementById("studentEditId").value;
+            const name = document.getElementById("studentName").value.trim();
+            const level = document.getElementById("studentLevel").value.trim();
+            const school = document.getElementById("studentSchool").value.trim();
+            const avatarData = document.getElementById("studentAvatarBase64").value;
+
+            if (!name) return;
+
+            if (editId) {
+                const index = state.students.findIndex(s => s.id === editId);
+                if (index !== -1) {
+                    state.students[index] = {
+                        ...state.students[index],
+                        name, level, school, avatarData
+                    };
+                }
+                showToast(`Profil ${name} telah dikemaskini!`);
+            } else {
+                const newStudent = {
+                    id: generateId(),
+                    name, level, school, avatarData
+                };
+                state.students.push(newStudent);
+                if (!state.activeStudentId) {
+                    state.activeStudentId = newStudent.id;
+                }
+                showToast(`Pelajar ${name} berjaya disimpan!`);
+            }
+
+            saveState();
+            closeModal("studentModal");
+            renderAll();
+        }
+
+        function switchStudent(id) {
+            state.activeStudentId = id;
+            saveState();
+            renderAll();
+        }
+
+        function openConfirmDeleteStudent(id) {
+            const student = state.students.find(s => s.id === id);
+            if (!student) return;
+
+            document.getElementById("confirmTitle").textContent = "Padam Pelajar?";
+            document.getElementById("confirmMessage").textContent = `Adakah anda pasti mahu memadam profil ${student.name}? Semua jadual waktu pelajar ini akan dipadam.`;
+            document.getElementById("confirmActionButton").onclick = () => {
+                state.students = state.students.filter(s => s.id !== id);
+                state.schedules = state.schedules.filter(s => s.studentId !== id);
+                state.cocurricular = (state.cocurricular || []).filter(c => c.studentId !== id);
+                if (state.activeStudentId === id) {
+                    state.activeStudentId = state.students.length > 0 ? state.students[0].id : null;
+                }
+                saveState();
+                closeModal("confirmModal");
+                renderAll();
+                showToast("Profil pelajar dipadam.");
+            };
+            showModal("confirmModal");
+        }
+
+        /* ============================================================
+           SCHEDULE ACTIONS
+        ============================================================ */
+        function switchDay(dayId) {
+            activeDay = dayId;
+            renderDaysTabs();
+            renderHeroStats();
+            renderScheduleList();
+            renderBagChecklist();
+        }
+
+        function openScheduleModal() {
+            if (!getActiveStudent()) {
+                showToast("Sila tambah pelajar dahulu!");
+                openStudentModal();
+                return;
+            }
+
+            document.getElementById("scheduleEditId").value = "";
+            document.getElementById("scheduleDay").value = String(activeDay);
+            document.getElementById("scheduleSubject").value = "";
+            document.getElementById("scheduleStart").value = "";
+            document.getElementById("scheduleEnd").value = "";
+            document.getElementById("scheduleBooks").value = "";
+            document.getElementById("scheduleNote").value = "";
+            document.getElementById("scheduleReminder").value = "10";
+            document.getElementById("scheduleType").value = "subjek";
+
+            document.getElementById("scheduleModalTitle").textContent = "📚 Tambah Subjek Jadual";
+            showModal("scheduleModal");
+        }
+
+        function saveScheduleForm(event) {
+            event.preventDefault();
+            const student = getActiveStudent();
+            if (!student) return;
+
+            const editId = document.getElementById("scheduleEditId").value;
+            const day = Number(document.getElementById("scheduleDay").value);
+            const subject = document.getElementById("scheduleSubject").value.trim();
+            const start = document.getElementById("scheduleStart").value;
+            const end = document.getElementById("scheduleEnd").value;
+            const booksRaw = document.getElementById("scheduleBooks").value;
+            const note = document.getElementById("scheduleNote").value.trim();
+            const reminder = Number(document.getElementById("scheduleReminder").value);
+            const type = document.getElementById("scheduleType").value;
+
+            const books = booksRaw.split(",").map(b => b.trim()).filter(Boolean);
+
+            if (editId) {
+                const index = state.schedules.findIndex(s => s.id === editId);
+                if (index !== -1) {
+                    state.schedules[index] = {
+                        ...state.schedules[index],
+                        day, subject, start, end, books, note, reminder, type
+                    };
+                }
+            } else {
+                state.schedules.push({
+                    id: generateId(),
+                    studentId: student.id,
+                    day, subject, start, end, books, note, reminder, type
+                });
+            }
+
+            saveState();
+            closeModal("scheduleModal");
+            renderAll();
+            showToast("Jadual berjaya disimpan!");
+        }
+
+        function editSchedule(id) {
+            const item = state.schedules.find(s => s.id === id);
+            if (!item) return;
+
+            document.getElementById("scheduleEditId").value = item.id;
+            document.getElementById("scheduleDay").value = String(item.day);
+            document.getElementById("scheduleSubject").value = item.subject;
+            document.getElementById("scheduleStart").value = item.start;
+            document.getElementById("scheduleEnd").value = item.end || "";
+            document.getElementById("scheduleBooks").value = (item.books || []).join(", ");
+            document.getElementById("scheduleNote").value = item.note || "";
+            document.getElementById("scheduleReminder").value = String(item.reminder ?? 10);
+            document.getElementById("scheduleType").value = item.type || "subjek";
+
+            document.getElementById("scheduleModalTitle").textContent = "✏️ Edit Subjek";
+            showModal("scheduleModal");
+        }
+
+        function openConfirmDeleteSchedule(id) {
+            document.getElementById("confirmTitle").textContent = "Padam Subjek?";
+            document.getElementById("confirmMessage").textContent = "Adakah anda pasti mahu memadam subjek ini daripada jadual?";
+            document.getElementById("confirmActionButton").onclick = () => {
+                state.schedules = state.schedules.filter(s => s.id !== id);
+                saveState();
+                closeModal("confirmModal");
+                renderAll();
+                showToast("Subjek dipadam.");
+            };
+            showModal("confirmModal");
+        }
+
+        /* ============================================================
+           SCHEDULE DUPLICATION & DAY COPYING
+        ============================================================ */
+        function duplicateSchedule(id) {
+            const original = state.schedules.find(s => s.id === id);
+            if (!original) return;
+
+            const copy = {
+                ...JSON.parse(JSON.stringify(original)),
+                id: generateId(),
+                subject: `${original.subject} (Salinan)`
+            };
+
+            state.schedules.push(copy);
+            saveState();
+            renderAll();
+            showToast(`Subjek "${original.subject}" berjaya didplikasi!`);
+        }
+
+        function openCopyDayModal() {
+            const student = getActiveStudent();
+            if (!student) {
+                showToast("Sila pilih/tambah pelajar dahulu.");
+                return;
+            }
+
+            const currentSchedules = getStudentSchedulesForDay(activeDay);
+            if (!currentSchedules.length) {
+                showToast("Tiada jadual pada hari ini untuk disalin.");
+                return;
+            }
+
+            const dayName = DAYS.find(d => d.id === activeDay)?.name || "";
+            document.getElementById("copySourceDayName").textContent = dayName;
+
+            const targetContainer = document.getElementById("targetDaysContainer");
+            targetContainer.innerHTML = DAYS
+                .filter(d => d.id !== activeDay)
+                .map(d => `
+                    <label style="display:flex; align-items:center; gap:6px; background:#f8fafc; padding:8px; border-radius:var(--radius-sm); border:1px solid var(--card-border); cursor:pointer; font-size:0.85rem; font-weight:600;">
+                        <input type="checkbox" name="copyTargetDays" value="${d.id}" style="accent-color:var(--primary); width:16px; height:16px;">
+                        <span>${d.name}</span>
+                    </label>
+                `).join("");
+
+            document.getElementById("overwriteTargetDays").checked = false;
+            showModal("copyDayModal");
+        }
+
+        function executeCopyDay(event) {
+            event.preventDefault();
+            const student = getActiveStudent();
+            if (!student) return;
+
+            const checkboxes = document.querySelectorAll('input[name="copyTargetDays"]:checked');
+            const targetDayIds = Array.from(checkboxes).map(cb => Number(cb.value));
+
+            if (!targetDayIds.length) {
+                showToast("Sila pilih sekurang-kurangnya satu hari sasaran.");
+                return;
+            }
+
+            const sourceSchedules = getStudentSchedulesForDay(activeDay);
+            const shouldOverwrite = document.getElementById("overwriteTargetDays").checked;
+
+            targetDayIds.forEach(targetDayId => {
+                if (shouldOverwrite) {
+                    state.schedules = state.schedules.filter(
+                        s => !(s.studentId === student.id && Number(s.day) === targetDayId)
+                    );
+                }
+
+                sourceSchedules.forEach(source => {
+                    state.schedules.push({
+                        ...JSON.parse(JSON.stringify(source)),
+                        id: generateId(),
+                        day: targetDayId
+                    });
+                });
+            });
+
+            saveState();
+            closeModal("copyDayModal");
+            renderAll();
+            showToast(`Jadual berjaya disalin ke ${targetDayIds.length} hari! 📋`);
+        }
+
+        /* ============================================================
+           COCURRICULAR ACTIONS
+        ============================================================ */
+        function openCocurricularModal() {
+            if (!getActiveStudent()) {
+                showToast("Sila tambah pelajar dahulu!");
+                openStudentModal();
+                return;
+            }
+
+            document.getElementById("cocoEditId").value = "";
+            document.getElementById("cocoCategory").value = "uniform";
+            document.getElementById("cocoDay").value = String(activeDay || 3);
+            document.getElementById("cocoName").value = "";
+            document.getElementById("cocoStart").value = "14:30";
+            document.getElementById("cocoEnd").value = "16:30";
+            document.getElementById("cocoUniform").value = "";
+            document.getElementById("cocoRole").value = "Ahli";
+            document.getElementById("cocoLocation").value = "";
+            document.getElementById("cocoItems").value = "";
+
+            document.getElementById("cocoModalTitle").textContent = "🏃 Tambah Aktiviti Kokurikulum";
+            showModal("cocurricularModal");
+        }
+
+        function saveCocurricularForm(event) {
+            event.preventDefault();
+            const student = getActiveStudent();
+            if (!student) return;
+
+            const editId = document.getElementById("cocoEditId").value;
+            const category = document.getElementById("cocoCategory").value;
+            const day = Number(document.getElementById("cocoDay").value);
+            const name = document.getElementById("cocoName").value.trim();
+            const start = document.getElementById("cocoStart").value;
+            const end = document.getElementById("cocoEnd").value;
+            const uniform = document.getElementById("cocoUniform").value.trim();
+            const role = document.getElementById("cocoRole").value.trim();
+            const location = document.getElementById("cocoLocation").value.trim();
+            const itemsRaw = document.getElementById("cocoItems").value;
+
+            const items = itemsRaw.split(",").map(i => i.trim()).filter(Boolean);
+
+            if (!state.cocurricular) state.cocurricular = [];
+
+            if (editId) {
+                const idx = state.cocurricular.findIndex(c => c.id === editId);
+                if (idx !== -1) {
+                    state.cocurricular[idx] = {
+                        ...state.cocurricular[idx],
+                        category, day, name, start, end, uniform, role, location, items
+                    };
+                }
+            } else {
+                state.cocurricular.push({
+                    id: generateId(),
+                    studentId: student.id,
+                    category, day, name, start, end, uniform, role, location, items
+                });
+            }
+
+            saveState();
+            closeModal("cocurricularModal");
+            renderAll();
+            showToast("Aktiviti Kokurikulum disimpan!");
+        }
+
+        function editCocurricular(id) {
+            const coco = (state.cocurricular || []).find(c => c.id === id);
+            if (!coco) return;
+
+            document.getElementById("cocoEditId").value = coco.id;
+            document.getElementById("cocoCategory").value = coco.category || "uniform";
+            document.getElementById("cocoDay").value = String(coco.day);
+            document.getElementById("cocoName").value = coco.name || "";
+            document.getElementById("cocoStart").value = coco.start || "14:30";
+            document.getElementById("cocoEnd").value = coco.end || "16:30";
+            document.getElementById("cocoUniform").value = coco.uniform || "";
+            document.getElementById("cocoRole").value = coco.role || "";
+            document.getElementById("cocoLocation").value = coco.location || "";
+            document.getElementById("cocoItems").value = (coco.items || []).join(", ");
+
+            document.getElementById("cocoModalTitle").textContent = "✏️ Edit Aktiviti Kokurikulum";
+            showModal("cocurricularModal");
+        }
+
+        function openConfirmDeleteCocurricular(id) {
+            document.getElementById("confirmTitle").textContent = "Padam Kokurikulum?";
+            document.getElementById("confirmMessage").textContent = "Adakah anda pasti mahu memadam aktiviti kokurikulum ini?";
+            document.getElementById("confirmActionButton").onclick = () => {
+                state.cocurricular = (state.cocurricular || []).filter(c => c.id !== id);
+                saveState();
+                closeModal("confirmModal");
+                renderAll();
+                showToast("Aktiviti kokurikulum dipadam.");
+            };
+            showModal("confirmModal");
+        }
+
+        /* ============================================================
+           TASK ACTIONS
+        ============================================================ */
+        function openTaskModal() {
+            if (!getActiveStudent()) {
+                showToast("Sila pilih/tambah pelajar dahulu.");
+                return;
+            }
+            document.getElementById("taskTitle").value = "";
+            document.getElementById("taskDueDate").valueAsDate = new Date();
+            showModal("taskModal");
+        }
+
+        function saveTaskForm(event) {
+            event.preventDefault();
+            const student = getActiveStudent();
+            if (!student) return;
+
+            const title = document.getElementById("taskTitle").value.trim();
+            const dueDate = document.getElementById("taskDueDate").value;
+
+            if (!state.tasks) state.tasks = [];
+            state.tasks.push({
+                id: generateId(),
+                studentId: student.id,
+                title,
+                dueDate,
+                completed: false
+            });
+
+            saveState();
+            closeModal("taskModal");
+            renderTaskList();
+            showToast("Tugasan ditambah!");
+        }
+
+        /* ============================================================
+           GEOLOCATION & NEARBY SCHOOLS
+        ============================================================ */
+        function findSchoolsNearMe() {
+            const status = document.getElementById("schoolStatus");
+            const results = document.getElementById("schoolResults");
+
+            if (!navigator.geolocation) {
+                status.textContent = "Geolocation tidak disokong oleh pelayar anda.";
+                return;
+            }
+
+            status.textContent = "📍 Mendapatkan lokasi GPS peranti...";
+            results.innerHTML = "";
+
+            navigator.geolocation.getCurrentPosition(
+                pos => {
+                    const lat = pos.coords.latitude;
+                    const lon = pos.coords.longitude;
+                    fetchNearbySchools(lat, lon);
+                },
+                err => {
+                    status.textContent = "Gagal mendapatkan lokasi GPS. Sila izinkan akses lokasi.";
+                },
+                { enableHighAccuracy: true, timeout: 10000 }
+            );
+        }
+
+        async function fetchNearbySchools(lat, lon) {
+            const status = document.getElementById("schoolStatus");
+            const results = document.getElementById("schoolResults");
+            status.textContent = "🔎 Mencari sekolah terdekat via OpenStreetMap...";
+
+            const radius = 5000;
+            const overpassQuery = `
+                [out:json][timeout:25];
+                (
+                    node["amenity"="school"](around:${radius},${lat},${lon});
+                    way["amenity"="school"](around:${radius},${lat},${lon});
+                );
+                out center 15;
+            `;
+
+            try {
+                const res = await fetch("https://overpass-api.de/api/interpreter", {
+                    method: "POST",
+                    body: overpassQuery
+                });
+                const data = await res.json();
+                const elements = data.elements || [];
+
+                if (!elements.length) {
+                    status.textContent = "Tiada sekolah dijumpai dalam radius 5km.";
+                    return;
+                }
+
+                status.textContent = `Jumpa ${elements.length} sekolah berdekatan!`;
+                results.innerHTML = elements.map(item => {
+                    const name = item.tags.name || item.tags["name:ms"] || "Sekolah";
+                    const itemLat = item.lat || item.center?.lat;
+                    const itemLon = item.lon || item.center?.lon;
+                    const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${itemLat},${itemLon}`;
+
+                    return `
+                        <div class="school-card">
+                            <h4>🏫 ${escapeHtml(name)}</h4>
+                            <p>${item.tags["addr:street"] || item.tags["addr:city"] || "Lokasi dikesan"}</p>
+                            <div class="school-links">
+                                <a href="${mapsUrl}" target="_blank" class="btn btn-light btn-sm">🗺 Open Maps</a>
+                                <button class="btn btn-secondary btn-sm" onclick="assignSchoolToStudent('${escapeAttribute(name)}')">
+                                    Pilih Sekolah Ini
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join("");
+
+            } catch (error) {
+                status.textContent = "Ralat semasa mengambil data sekolah. Sila cuba lagi.";
+            }
+        }
+
+        function assignSchoolToStudent(schoolName) {
+            const student = getActiveStudent();
+            if (!student) {
+                showToast("Sila pilih pelajar dahulu.");
+                return;
+            }
+
+            student.school = schoolName;
+            saveState();
+            renderStudents();
+            showToast(`Sekolah ${schoolName} ditetapkan untuk ${student.name}!`);
+        }
+
+        /* ============================================================
+           DATA IMPORT & EXPORT & SAMPLE DATA
+        ============================================================ */
+        function loadSampleData() {
+            state = {
+                students: [
+                    { id: "s1", name: "Adam Harith", level: "Tahun 4 Cemerlang", school: "SK Taman Melawati", avatarData: "" }
+                ],
+                activeStudentId: "s1",
+                schedules: [
+                    { id: "sc1", studentId: "s1", day: 1, subject: "Bahasa Melayu", start: "07:30", end: "08:30", books: ["Buku Teks BM Jilid 1", "Buku Latihan A"], note: "Ejaan halaman 12", type: "subjek", reminder: 10 },
+                    { id: "sc2", studentId: "s1", day: 1, subject: "Matematik", start: "08:30", end: "09:30", books: ["Buku Teks Matematik", "Buku Petak"], note: "Bawa pembaris", type: "subjek", reminder: 10 },
+                    { id: "sc3", studentId: "s1", day: 1, subject: "Pendidikan Islam", start: "10:00", end: "11:00", books: ["Buku Teks PI"], note: "", type: "subjek", reminder: 10 },
+                    { id: "sc4", studentId: "s1", day: 2, subject: "Sains", start: "07:30", end: "08:30", books: ["Buku Teks Sains", "Buku Amali"], note: "", type: "subjek", reminder: 10 },
+                    { id: "sc5", studentId: "s1", day: 3, subject: "Bahasa Inggeris", start: "07:30", end: "08:30", books: ["English Textbook", "Workbook"], note: "", type: "subjek", reminder: 10 }
+                ],
+                cocurricular: [
+                    { id: "co1", studentId: "s1", category: "uniform", day: 3, name: "Pengakap Kanak-Kanak", start: "14:30", end: "16:30", uniform: "Uniform Lengkap Pengakap", role: "Ketua Sekawan", location: "Dewan Utama Sekolah", items: ["Buku Log Pengakap", "Tali Rotan (1 Meter)", "Wisel"] },
+                    { id: "co2", studentId: "s1", category: "sukan", day: 2, name: "Kelab Bola Sepak", start: "17:00", end: "18:30", uniform: "Baju T-Sukan Sekolah", role: "Ahli Pasukan", location: "Padang Bola Sekolah", items: ["Kasut Bola Sepak", "Shin Guard", "Botol Air"] },
+                    { id: "co3", studentId: "s1", category: "persatuan", day: 4, name: "Kelab STEM & Inovasi", start: "14:30", end: "15:30", uniform: "Uniform Sekolah Biasa", role: "AJK Publisiti", location: "Makmal Komputer", items: ["Fail Projek STEM", "Alat Tulis Khas"] }
+                ],
+                tasks: [
+                    { id: "t1", studentId: "s1", title: "Latihan Matematik M/S 40", dueDate: "2026-08-20", completed: false }
+                ],
+                packedBooks: {}
+            };
+            saveState();
+            renderAll();
+            showToast("Data contoh sekolah telah dimuatkan! 🪄");
+        }
+
+        function exportAppData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
+            const downloadAnchor = document.createElement("a");
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `beg-sekolah-backup-${new Date().toISOString().slice(0,10)}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+            showToast("Backup data dieksport.");
+        }
+
+        function importAppData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (imported && Array.isArray(imported.students)) {
+                        state = imported;
+                        saveState();
+                        renderAll();
+                        showToast("Data berjaya diimport! 🎉");
+                    } else {
+                        showToast("Format fail tidak sah.");
+                    }
+                } catch (err) {
+                    showToast("Ralat membaca fail backup.");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        /* ============================================================
+           NOTIFICATION & SOUND TIMER ENGINE
+        ============================================================ */
+        function enableNotifications() {
+            if (!("Notification" in window)) {
+                showToast("Pelayar anda tidak menyokong notifikasi web.");
+                return;
+            }
+            Notification.requestPermission().then(perm => {
+                if (perm === "granted") {
+                    showToast("Notifikasi diaktifkan! 🔔");
+                    new Notification("Beg Sekolah", { body: "Peringatan waktu dan sekolah kini aktif." });
+                } else {
+                    showToast("Izin notifikasi dinafikan.");
+                }
+            });
+        }
+
+        function startReminderTimer() {
+            checkReminders();
+            setInterval(checkReminders, 30000);
+        }
+
+        function checkReminders() {
+            const student = getActiveStudent();
+            if (!student) return;
+
+            const now = new Date();
+            const currentDay = now.getDay();
+            const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+            const todaySchedules = getStudentSchedulesForDay(currentDay);
+
+            todaySchedules.forEach(schedule => {
+                if (!schedule.start) return;
+                const [h, m] = schedule.start.split(":").map(Number);
+                const classStartMinutes = h * 60 + m;
+                const reminderMinutes = classStartMinutes - (schedule.reminder || 10);
+
+                if (currentMinutes === reminderMinutes) {
+                    const notifyKey = `notified_${now.toDateString()}_${schedule.id}`;
+                    if (!localStorage.getItem(notifyKey)) {
+                        localStorage.setItem(notifyKey, "true");
+                        triggerNotification(schedule);
+                    }
+                }
+            });
+        }
+
+        function triggerNotification(schedule) {
+            playChimeSound();
+            const msg = `Kelas ${schedule.subject} bermula jam ${schedule.start}. ${schedule.books?.length ? 'Buku: ' + schedule.books.join(', ') : ''}`;
+
+            if ("Notification" in window && Notification.permission === "granted") {
+                new Notification(`🎒 Peringatan Subjek: ${schedule.subject}`, {
+                    body: msg,
+                    tag: schedule.id
+                });
+            } else {
+                showToast(`⏰ ${msg}`);
+            }
+        }
+
+        function playChimeSound() {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContext) return;
+                const ctx = new AudioContext();
+
+                const notes = [523.25, 659.25, 783.99];
+                notes.forEach((freq, idx) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+
+                    osc.type = 'sine';
+                    osc.frequency.value = freq;
+
+                    const startTime = ctx.currentTime + (idx * 0.12);
+                    gain.gain.setValueAtTime(0.001, startTime);
+                    gain.gain.exponentialRampToValueAtTime(0.2, startTime + 0.05);
+                    gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.4);
+
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+
+                    osc.start(startTime);
+                    osc.stop(startTime + 0.45);
+                });
+            } catch (e) {
+                console.log("Audio tidak disokong atau dihalang.");
+            }
+        }
+
+        /* ============================================================
+           HELPERS & MODAL CONTROLS
+        ============================================================ */
+        function getTypeEmoji(type) {
+            switch(type) {
+                case 'kokurikulum': return '🏃';
+                case 'peperiksaan': return '📝';
+                case 'aktiviti': return '🎯';
+                default: return '📚';
+            }
+        }
+
+        function showModal(id) {
+            document.getElementById(id).classList.add("show");
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove("show");
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById("toast");
+            toast.textContent = msg;
+            toast.classList.add("show");
+            clearTimeout(window.toastTimer);
+            window.toastTimer = setTimeout(() => toast.classList.remove("show"), 3500);
+        }
+
+        function escapeHtml(str) {
+            return String(str ?? '')
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function escapeAttribute(str) {
+            return String(str ?? '').replace(/'/g, "\\'");
+        }
+    </script>
+</body>
+</html>
