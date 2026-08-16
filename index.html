@@ -420,6 +420,10 @@
         .schedule-card.type-kokurikulum { border-left-color: #ec4899; }
         .schedule-card.type-peperiksaan { border-left-color: #ef4444; }
         .schedule-card.type-aktiviti { border-left-color: #f59e0b; }
+        .schedule-card.type-kafa { border-left-color: #10b981; }
+        .schedule-card.type-tuisyen { border-left-color: #8b5cf6; }
+        .schedule-card.type-rehat { border-left-color: #64748b; }
+        .schedule-card.type-perhimpunan { border-left-color: #06b6d4; }
 
         .cocurricular-card {
             border: 1px solid var(--card-border);
@@ -1058,6 +1062,10 @@
                             <option value="subjek">📚 Subjek Akademik</option>
                             <option value="peperiksaan">📝 Peperiksaan / Ujian</option>
                             <option value="kokurikulum">🏃 Ko-Kurikulum</option>
+                            <option value="kafa">🕌 Kelas KAFA</option>
+                            <option value="tuisyen">📖 Kelas Tuisyen</option>
+                            <option value="rehat">🍱 Rehat</option>
+                            <option value="perhimpunan">📢 Perhimpunan</option>
                             <option value="aktiviti">🎯 Aktiviti Khas</option>
                         </select>
                     </div>
@@ -1619,6 +1627,10 @@
                 case 'peperiksaan': return '📝';
                 case 'kokurikulum': return '🏃';
                 case 'aktiviti': return '🎯';
+                case 'kafa': return '🕌';
+                case 'tuisyen': return '📖';
+                case 'rehat': return '🍱';
+                case 'perhimpunan': return '📢';
                 default: return '📚';
             }
         }
@@ -1640,6 +1652,10 @@
             let items = [];
 
             daySchedules.forEach(s => {
+                // Jangan masukkan apa-apa untuk Rehat dan Perhimpunan
+                if (s.type === 'rehat' || s.type === 'perhimpunan') {
+                    return;
+                }
                 if (s.books) {
                     const parsed = s.books.split(',').map(b => b.trim()).filter(Boolean);
                     items.push(...parsed);
@@ -1692,6 +1708,10 @@
 
             const daySchedules = appData.schedules.filter(s => s.studentId === activeStudent.id && parseInt(s.day) === selectedDay);
             daySchedules.forEach(s => {
+                // Abaikan Rehat dan Perhimpunan
+                if (s.type === 'rehat' || s.type === 'perhimpunan') {
+                    return;
+                }
                 const books = s.books ? s.books.split(',').map(b => b.trim()).filter(Boolean) : [`Buku ${s.subject}`];
                 books.forEach(b => {
                     const key = `${activeStudent.id}_${selectedDay}_${b}`;
@@ -1803,6 +1823,10 @@
             let packedItems = 0;
 
             daySchedules.forEach(s => {
+                // Abaikan Rehat dan Perhimpunan dalam statistik keperluan beg
+                if (s.type === 'rehat' || s.type === 'perhimpunan') {
+                    return;
+                }
                 const books = s.books ? s.books.split(',').map(b => b.trim()).filter(Boolean) : [`Buku ${s.subject}`];
                 books.forEach(b => {
                     totalItems++;
