@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#4f46e5">
-    <title>Beg Sekolah - Pengurusan Jadual . Beg Sekolah . Ko-Kurikulum</title>
+    <title>Beg Sekolah - Pengurusan Jadual & Ko-Kurikulum</title>
     <!-- Font & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -293,8 +293,22 @@
             height: 52px;
             border-radius: 50%;
             object-fit: cover;
-            border: 3px solid var(--primary-light);
+            border: 3px solid #c7d2fe;
             box-shadow: var(--shadow-sm);
+        }
+
+        .greeting-avatar-fallback {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.4rem;
+            border: 3px solid #c7d2fe;
         }
 
         .greeting h2 {
@@ -751,13 +765,6 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
-        .badge-count {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 2px 8px;
-            border-radius: 999px;
-            font-size: 0.75rem;
-        }
     </style>
 </head>
 <body>
@@ -812,25 +819,6 @@
                 <div id="schoolStatus" style="font-size: 0.8rem; margin-top: 10px; color: var(--text-muted);"></div>
                 <div id="schoolResults"></div>
             </div>
-
-            <!-- DATA MANAGEMENT -->
-            <div class="card">
-                <div class="card-header">
-                    <span class="card-title">⚙️ Data & Tetapan</span>
-                </div>
-                <div style="display: flex; flex-direction: column; gap: 8px;">
-                    <button class="btn btn-light btn-full" onclick="loadSampleData()">
-                        🪄 Muat Data Contoh
-                    </button>
-                    <button class="btn btn-light btn-full" onclick="exportAppData()">
-                        📤 Eksport Backup (JSON)
-                    </button>
-                    <button class="btn btn-light btn-full" onclick="document.getElementById('importFileInput').click()">
-                        📥 Import Backup
-                    </button>
-                    <input type="file" id="importFileInput" accept=".json" style="display:none" onchange="importAppData(event)">
-                </div>
-            </div>
         </aside>
 
         <!-- CONTENT AREA (UTAMAKAN JADUAL SEKOLAH) -->
@@ -864,7 +852,7 @@
                     <div class="stat-box">
                         <div class="icon">🎒</div>
                         <label>Siap Pack Beg</label>
-                        <val id="statPackedCount">0</val>
+                        <val id="statPackedCount">0%</val>
                     </div>
                     <div class="stat-box">
                         <div class="icon">⏰</div>
@@ -894,7 +882,7 @@
                 <div id="scheduleContainer" class="schedule-list"></div>
             </div>
 
-            <!-- CHECKLIST BEK SEKOLAH -->
+            <!-- CHECKLIST BEG SEKOLAH -->
             <div class="card">
                 <div class="card-header">
                     <span class="card-title">🎒 Beg Saya (Checklist Buku & Keperluan)</span>
@@ -930,6 +918,22 @@
                     Pendaftaran aktiviti: Unit Beruniform, Sukan & Permainan, serta Kelab/Persatuan.
                 </p>
                 <div id="cocurricularContainer" style="display: flex; flex-direction: column; gap: 12px;"></div>
+            </div>
+
+            <!-- DATA MANAGEMENT (DIPINDAHKAN KE PALING BAWAH) -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">⚙️ Data & Tetapan</span>
+                </div>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                    <button class="btn btn-light" style="flex: 1; min-width: 200px;" onclick="exportAppData()">
+                        📤 Eksport Backup (JSON)
+                    </button>
+                    <button class="btn btn-light" style="flex: 1; min-width: 200px;" onclick="document.getElementById('importFileInput').click()">
+                        📥 Import Backup
+                    </button>
+                    <input type="file" id="importFileInput" accept=".json" style="display:none" onchange="importAppData(event)">
+                </div>
             </div>
         </section>
 
@@ -979,7 +983,7 @@
     </div>
 
     <!-- MODAL: JADUAL / SUBJEK -->
-<div class="modal-backdrop" id="scheduleModal">
+    <div class="modal-backdrop" id="scheduleModal">
         <div class="modal-content">
             <div class="modal-header">
                 <h3 id="scheduleModalTitle">📚 Tambah Subjek</h3>
@@ -1005,6 +1009,7 @@
                         <select id="scheduleType">
                             <option value="subjek">📚 Subjek Akademik</option>
                             <option value="peperiksaan">📝 Peperiksaan / Ujian</option>
+                            <option value="kokurikulum">🏃 Ko-Kurikulum</option>
                             <option value="aktiviti">🎯 Aktiviti Khas</option>
                         </select>
                     </div>
@@ -1018,33 +1023,28 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label>Masa Mula</label>
-                        <input type="time" id="scheduleStart" required>
+                        <input type="time" id="scheduleStartTime" required value="07:30">
                     </div>
                     <div class="form-group">
                         <label>Masa Tamat</label>
-                        <input type="time" id="scheduleEnd">
+                        <input type="time" id="scheduleEndTime" required value="08:30">
                     </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Buku / Peralatan Perlu Dibawa (Koma-separated)</label>
-                    <input type="text" id="scheduleBooks" placeholder="Contoh: Buku Teks Jilid 1, Buku Latihan A, Pembaris">
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Nota / Pesanan Guru</label>
-                        <input type="text" id="scheduleNote" placeholder="Contoh: Kerja rumah M/S 12">
+                        <label>Guru / Penasihat</label>
+                        <input type="text" id="scheduleTeacher" placeholder="Contoh: Cikgu Noraini">
                     </div>
                     <div class="form-group">
-                        <label>Peringatan Notifikasi (Minit awal)</label>
-                        <select id="scheduleReminder">
-                            <option value="5">5 Minit Awal</option>
-                            <option value="10" selected>10 Minit Awal</option>
-                            <option value="15">15 Minit Awal</option>
-                            <option value="30">30 Minit Awal</option>
-                        </select>
+                        <label>Bilik / Lokasi</label>
+                        <input type="text" id="scheduleLocation" placeholder="Contoh: Kelas 4C / Makmal Sains">
                     </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Buku / Barang Keperluan (Asingkan dengan koma)</label>
+                    <input type="text" id="scheduleBooks" placeholder="Contoh: Buku Teks, Buku Latihan 1, Geometri Set">
                 </div>
 
                 <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px;">
@@ -1055,132 +1055,55 @@
         </div>
     </div>
 
-    <!-- MODAL: SALIN JADUAL HARI -->
+    <!-- MODAL: SALIN HARI -->
     <div class="modal-backdrop" id="copyDayModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>📋 Salin Jadual Waktu Hari Ini</h3>
+                <h3>📋 Salin Jadual Hari Ini</h3>
                 <button class="btn btn-light btn-sm" onclick="closeModal('copyDayModal')">✕</button>
             </div>
-            <form onsubmit="executeCopyDay(event)">
-                <p style="font-size:0.875rem; color: var(--text-muted); margin-bottom:14px;">
-                    Salin kesemua subjek dari hari <strong id="copySourceDayName" style="color:var(--primary);">Isnin</strong> ke hari-hari lain:
-                </p>
-
-                <div class="form-group">
-                    <label>Pilih Hari Sasaran:</label>
-                    <div id="targetDaysContainer" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap:8px; margin-top:8px;">
-                        <!-- Options generated dynamically -->
-                    </div>
-                </div>
-
-                <div class="form-group" style="margin-top:10px;">
-                    <label style="font-weight: normal; font-size: 0.85rem; display:flex; align-items:center; gap:8px; cursor:pointer;">
-                        <input type="checkbox" id="overwriteTargetDays" style="width:16px; height:16px; accent-color:var(--primary);">
-                        <span>Gantikan (padam) jadual sedia ada pada hari sasaran</span>
-                    </label>
-                </div>
-
-                <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px;">
-                    <button type="button" class="btn btn-light" onclick="closeModal('copyDayModal')">Batal</button>
-                    <button type="submit" class="btn btn-primary">Salin Jadual</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- MODAL: KOKURIKULUM, SUKAN & PERSATUAN -->
-    <div class="modal-backdrop" id="cocurricularModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="cocoModalTitle">🏃 Tambah Aktiviti Kokurikulum</h3>
-                <button class="btn btn-light btn-sm" onclick="closeModal('cocurricularModal')">✕</button>
+            <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 14px;">
+                Salin semua subjek dari <strong id="copyFromDayName">Isnin</strong> ke hari lain:
+            </p>
+            <div class="form-group">
+                <label>Pilih Hari Sasaran</label>
+                <select id="copyToDaySelect">
+                    <option value="1">Isnin</option>
+                    <option value="2">Selasa</option>
+                    <option value="3">Rabu</option>
+                    <option value="4">Khamis</option>
+                    <option value="5">Jumaat</option>
+                </select>
             </div>
-            <form onsubmit="saveCocurricularForm(event)">
-                <input type="hidden" id="cocoEditId">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Kategori Kokurikulum</label>
-                        <select id="cocoCategory" required>
-                            <option value="uniform">⛺ Unit Beruniform</option>
-                            <option value="sukan">⚽ Sukan & Permainan</option>
-                            <option value="persatuan">🎨 Kelab & Persatuan</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Hari Perjumpaan</label>
-                        <select id="cocoDay" required>
-                            <option value="1">Isnin</option>
-                            <option value="2">Selasa</option>
-                            <option value="3" selected>Rabu</option>
-                            <option value="4">Khamis</option>
-                            <option value="5">Jumaat</option>
-                            <option value="6">Sabtu</option>
-                            <option value="0">Ahad</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Nama Kelab / Sukan / Unit Beruniform</label>
-                    <input type="text" id="cocoName" required placeholder="Contoh: Pengakap Kanak-Kanak / Kelab STEM / Kelab Bola Sepak">
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Masa Mula</label>
-                        <input type="time" id="cocoStart" required value="14:30">
-                    </div>
-                    <div class="form-group">
-                        <label>Masa Tamat</label>
-                        <input type="time" id="cocoEnd" value="16:30">
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Pakaian / Uniform Perlu Dipakai</label>
-                        <input type="text" id="cocoUniform" placeholder="Contoh: Uniform Lengkap Pengakap / Baju T-Sukan">
-                    </div>
-                    <div class="form-group">
-                        <label>Jawatan / Peranan</label>
-                        <input type="text" id="cocoRole" placeholder="Contoh: Ahli / Pengerusi / AJK">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Tempat Perjumpaan / Lokasi</label>
-                    <input type="text" id="cocoLocation" placeholder="Contoh: Padang Sekolah / Dewan Utama / Makmal Komputer">
-                </div>
-
-                <div class="form-group">
-                    <label>Peralatan & Barangan Keperluan (Koma-separated)</label>
-                    <input type="text" id="cocoItems" placeholder="Contoh: Buku Log Pengakap, Tali Rotan, Kasut Sukan, Raket Badminton">
-                </div>
-
-                <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px;">
-                    <button type="button" class="btn btn-light" onclick="closeModal('cocurricularModal')">Batal</button>
-                    <button type="submit" class="btn btn-primary">Simpan Aktiviti</button>
-                </div>
-            </form>
+            <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px;">
+                <button type="button" class="btn btn-light" onclick="closeModal('copyDayModal')">Batal</button>
+                <button type="button" class="btn btn-primary" onclick="confirmCopyDay()">Salin Sekarang</button>
+            </div>
         </div>
     </div>
 
-    <!-- MODAL: TUGASAN / KERJA RUMAH -->
+    <!-- MODAL: KERJA RUMAH / TUGASAN -->
     <div class="modal-backdrop" id="taskModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>📝 Tambah Kerja Rumah / Tugasan</h3>
+                <h3 id="taskModalTitle">📝 Tambah Tugasan</h3>
                 <button class="btn btn-light btn-sm" onclick="closeModal('taskModal')">✕</button>
             </div>
             <form onsubmit="saveTaskForm(event)">
+                <input type="hidden" id="taskEditId">
                 <div class="form-group">
-                    <label>Subjek / Tajuk Tugasan</label>
-                    <input type="text" id="taskTitle" required placeholder="Contoh: Latihan Matematik M/S 45">
+                    <label>Tajuk Tugasan / Kerja Rumah</label>
+                    <input type="text" id="taskTitle" required placeholder="Contoh: Latihan Muka Surat 45">
                 </div>
-                <div class="form-group">
-                    <label>Tarikh Hantar / Due Date</label>
-                    <input type="date" id="taskDueDate" required>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Subjek</label>
+                        <input type="text" id="taskSubject" placeholder="Contoh: Matematik">
+                    </div>
+                    <div class="form-group">
+                        <label>Tarikh Hantar</label>
+                        <input type="date" id="taskDueDate">
+                    </div>
                 </div>
                 <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px;">
                     <button type="button" class="btn btn-light" onclick="closeModal('taskModal')">Batal</button>
@@ -1190,1046 +1113,950 @@
         </div>
     </div>
 
-    <!-- MODAL: CONFIRMATION DIALOG -->
-    <div class="modal-backdrop" id="confirmModal">
-        <div class="modal-content" style="max-width: 400px; text-align: center;">
-            <div style="font-size: 3rem; margin-bottom: 8px;">⚠️</div>
-            <h3 id="confirmTitle" style="margin-bottom: 8px;">Pengesahan</h3>
-            <p id="confirmMessage" style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">Adakah anda pasti?</p>
-            <div style="display: flex; gap: 10px; justify-content: center;">
-                <button class="btn btn-light" onclick="closeModal('confirmModal')">Batal</button>
-                <button id="confirmActionButton" class="btn btn-danger">Teruskan</button>
+    <!-- MODAL: KOKURIKULUM -->
+    <div class="modal-backdrop" id="cocurricularModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="cocurricularModalTitle">🏃 Tambah Aktiviti Ko-Kurikulum</h3>
+                <button class="btn btn-light btn-sm" onclick="closeModal('cocurricularModal')">✕</button>
             </div>
+            <form onsubmit="saveCocurricularForm(event)">
+                <input type="hidden" id="cocoEditId">
+                <div class="form-group">
+                    <label>Nama Kelab / Sukan / Unit</label>
+                    <input type="text" id="cocoName" required placeholder="Contoh: Pengakap / Kelab Catur / Bola Sepak">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Kategori</label>
+                        <select id="cocoCategory">
+                            <option value="uniform">🎖️ Unit Beruniform</option>
+                            <option value="sukan">⚽ Sukan & Permainan</option>
+                            <option value="persatuan">🎨 Kelab & Persatuan</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Hari Perjumpaan</label>
+                        <select id="cocoDay">
+                            <option value="3">Rabu</option>
+                            <option value="1">Isnin</option>
+                            <option value="2">Selasa</option>
+                            <option value="4">Khamis</option>
+                            <option value="5">Jumaat</option>
+                            <option value="6">Sabtu</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Masa</label>
+                        <input type="text" id="cocoTime" placeholder="Contoh: 2:00 PM - 4:00 PM">
+                    </div>
+                    <div class="form-group">
+                        <label>Lokasi / Tempat</label>
+                        <input type="text" id="cocoVenue" placeholder="Contoh: Padang Sekolah / Dewan">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Keperluan / Pakaian Uniform</label>
+                    <input type="text" id="cocoNotes" placeholder="Contoh: Pakaian Uniform Lengkap Pengakap / Baju Sukan">
+                </div>
+                <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px;">
+                    <button type="button" class="btn btn-light" onclick="closeModal('cocurricularModal')">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan Aktiviti</button>
+                </div>
+            </form>
         </div>
     </div>
 
     <!-- TOAST NOTIFICATION -->
-    <div id="toast" class="toast"></div>
+    <div id="toast" class="toast">Aksi berjaya dilaksanakan!</div>
 
+    <!-- JAVASCRIPT LOGIC -->
     <script>
-        /* ============================================================
-           STATE MANAGEMENT
-        ============================================================ */
-        const DAYS = [
-            { id: 1, name: "Isnin", short: "ISN" },
-            { id: 2, name: "Selasa", short: "SEL" },
-            { id: 3, name: "Rabu", short: "RAB" },
-            { id: 4, name: "Khamis", short: "KHA" },
-            { id: 5, name: "Jumaat", short: "JUM" },
-            { id: 6, name: "Sabtu", short: "SAB" },
-            { id: 0, name: "Ahad", short: "AHD" }
-        ];
-
-        let state = JSON.parse(localStorage.getItem("beg_sekolah_db")) || {
-            students: [],
-            schedules: [],
-            cocurricular: [],
-            tasks: [],
-            activeStudentId: null,
-            packedBooks: {}
+        const DAYS_MAP = {
+            1: "Isnin",
+            2: "Selasa",
+            3: "Rabu",
+            4: "Khamis",
+            5: "Jumaat",
+            6: "Sabtu",
+            0: "Ahad"
         };
 
-        let activeDay = new Date().getDay();
+        let appData = {
+            students: [],
+            activeStudentId: null,
+            schedules: [],
+            packedState: {}, // key: `${studentId}_${day}_${item}` -> boolean
+            tasks: [],
+            cocurricular: []
+        };
 
-        if (!state.activeStudentId && state.students.length > 0) {
-            state.activeStudentId = state.students[0].id;
-        }
+        let selectedDay = new Date().getDay(); // Default current day (0-6)
 
-        if (!state.cocurricular) {
-            state.cocurricular = [];
-        }
-
-        saveState();
-
-        document.addEventListener("DOMContentLoaded", () => {
+        // Initialize App
+        window.addEventListener('DOMContentLoaded', () => {
+            loadAppData();
+            if (appData.students.length === 0) {
+                loadSampleData(false);
+            }
             renderAll();
-            startReminderTimer();
+            updateCurrentDateDisplay();
         });
 
-        function saveState() {
-            localStorage.setItem("beg_sekolah_db", JSON.stringify(state));
+        function loadAppData() {
+            const stored = localStorage.getItem('begSekolahData_v2');
+            if (stored) {
+                try {
+                    appData = JSON.parse(stored);
+                } catch(e) {
+                    console.error("Gagal membaca LocalStorage:", e);
+                }
+            }
         }
 
-        function generateId() {
-            return 'id_' + Math.random().toString(36).substr(2, 9);
+        function saveAppData() {
+            localStorage.setItem('begSekolahData_v2', JSON.stringify(appData));
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        function updateCurrentDateDisplay() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const dateStr = now.toLocaleDateString('ms-MY', options);
+            document.getElementById('currentFullDate').textContent = dateStr;
+        }
+
+        function renderAll() {
+            renderStudents();
+            renderGreeting();
+            renderDaysTab();
+            renderSchedule();
+            renderBagChecklist();
+            renderTasks();
+            renderCocurricular();
+            renderStats();
         }
 
         function getActiveStudent() {
-            return state.students.find(s => s.id === state.activeStudentId);
-        }
-
-        /* ============================================================
-           RENDER FUNCTIONS
-        ============================================================ */
-        function renderAll() {
-            renderStudents();
-            renderHeroStats();
-            renderDaysTabs();
-            renderScheduleList();
-            renderCocurricularList();
-            renderBagChecklist();
-            renderTaskList();
+            return appData.students.find(s => s.id === appData.activeStudentId) || appData.students[0] || null;
         }
 
         function renderStudents() {
-            const container = document.getElementById("studentListContainer");
-            if (!state.students.length) {
+            const container = document.getElementById('studentListContainer');
+            container.innerHTML = '';
+
+            if (appData.students.length === 0) {
                 container.innerHTML = `
-                    <div class="empty-box" style="padding: 15px 0;">
-                        <div style="font-size:1.8rem;">👦</div>
-                        <p style="font-size:0.8rem; margin-top:4px;">Belum ada pelajar direkodkan.</p>
-                    </div>
-                `;
+                    <div class="empty-box" style="padding: 16px;">
+                        <p style="font-size:0.85rem;">Tiada profil pelajar. Sila tambah pelajar baharu.</p>
+                    </div>`;
                 return;
             }
 
-            container.innerHTML = state.students.map(student => {
-                const isSelected = student.id === state.activeStudentId;
-                const avatarHtml = student.avatarData 
-                    ? `<img src="${student.avatarData}" class="student-avatar-img" alt="Avatar">`
-                    : `<div class="student-avatar-fallback">${student.name.charAt(0).toUpperCase()}</div>`;
+            appData.students.forEach(student => {
+                const isActive = student.id === appData.activeStudentId;
+                const card = document.createElement('div');
+                card.className = `student-card ${isActive ? 'active' : ''}`;
+                card.onclick = () => {
+                    appData.activeStudentId = student.id;
+                    saveAppData();
+                    renderAll();
+                };
 
-                return `
-                    <div class="student-card ${isSelected ? 'active' : ''}" onclick="switchStudent('${student.id}')">
-                        <div class="student-avatar-box">${avatarHtml}</div>
-                        <div class="student-details">
-                            <strong>${escapeHtml(student.name)}</strong>
-                            <small>${escapeHtml(student.level || 'Pelajar')} ${student.school ? '• ' + escapeHtml(student.school) : ''}</small>
-                        </div>
-                        <div class="student-actions">
-                            <button class="btn btn-light btn-sm" onclick="event.stopPropagation(); openEditStudentModal('${student.id}')" title="Edit Profil">✏️</button>
-                            <button class="btn btn-light btn-sm" onclick="event.stopPropagation(); openConfirmDeleteStudent('${student.id}')" title="Padam">🗑</button>
-                        </div>
+                let avatarHtml = `<div class="student-avatar-fallback">${student.name.charAt(0).toUpperCase()}</div>`;
+                if (student.avatarUrl) {
+                    avatarHtml = `<img src="${student.avatarUrl}" class="student-avatar-img" alt="${student.name}">`;
+                }
+
+                card.innerHTML = `
+                    <div class="student-avatar-box">${avatarHtml}</div>
+                    <div class="student-details">
+                        <strong>${student.name}</strong>
+                        <small>${student.level || 'Pelajar'} • ${student.school || '-'}</small>
+                    </div>
+                    <div class="student-actions" onclick="event.stopPropagation()">
+                        <button class="btn btn-light btn-sm" onclick="editStudent('${student.id}')">✏️</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteStudent('${student.id}')">🗑️</button>
                     </div>
                 `;
-            }).join("");
+                container.appendChild(card);
+            });
         }
 
-        function renderHeroStats() {
-            const student = getActiveStudent();
-            const now = new Date();
-            
-            document.getElementById("currentFullDate").textContent = now.toLocaleDateString("ms-MY", {
-                weekday: "long", day: "numeric", month: "long", year: "numeric"
+        function renderGreeting() {
+            const active = getActiveStudent();
+            const avatarBox = document.getElementById('greetingAvatarBox');
+            const nameHeader = document.getElementById('greetingName');
+
+            if (active) {
+                nameHeader.textContent = `Hai, ${active.name}! 👋`;
+                if (active.avatarUrl) {
+                    avatarBox.innerHTML = `<img src="${active.avatarUrl}" class="greeting-avatar" alt="${active.name}">`;
+                } else {
+                    avatarBox.innerHTML = `<div class="greeting-avatar-fallback">${active.name.charAt(0).toUpperCase()}</div>`;
+                }
+            } else {
+                nameHeader.textContent = `Selamat Datang! 👋`;
+                avatarBox.innerHTML = `<div class="greeting-avatar-fallback">🎒</div>`;
+            }
+        }
+
+        function renderDaysTab() {
+            const container = document.getElementById('daysTab');
+            container.innerHTML = '';
+
+            const dayKeys = [1, 2, 3, 4, 5, 6, 0]; // Isnin to Ahad
+            dayKeys.forEach(dayNum => {
+                const btn = document.createElement('button');
+                btn.className = `day-btn ${selectedDay === dayNum ? 'active' : ''}`;
+                btn.onclick = () => {
+                    selectedDay = dayNum;
+                    renderDaysTab();
+                    renderSchedule();
+                    renderBagChecklist();
+                    renderStats();
+                };
+
+                // Count items for this day
+                const activeStudent = getActiveStudent();
+                let count = 0;
+                if (activeStudent) {
+                    count = appData.schedules.filter(s => s.studentId === activeStudent.id && parseInt(s.day) === dayNum).length;
+                }
+
+                btn.innerHTML = `
+                    <strong>${DAYS_MAP[dayNum]}</strong>
+                    <small>${count} Subjek</small>
+                `;
+                container.appendChild(btn);
             });
 
-            document.getElementById("greetingName").textContent = student ? `Hai, ${student.name}! 👋` : "Selamat datang! 👋";
-
-            const avatarContainer = document.getElementById("greetingAvatarBox");
-            if (student && student.avatarData) {
-                avatarContainer.innerHTML = `<img src="${student.avatarData}" class="greeting-avatar" alt="Profil">`;
-            } else if (student) {
-                avatarContainer.innerHTML = `<div class="student-avatar-fallback" style="width:52px; height:52px; font-size:1.4rem;">${student.name.charAt(0).toUpperCase()}</div>`;
-            } else {
-                avatarContainer.innerHTML = ``;
-            }
-
-            const studentSchedules = getStudentSchedulesForDay(activeDay);
-            const booksNeeded = getBooksForDay(activeDay);
-            const packedCount = booksNeeded.filter(b => b.packed).length;
-
-            document.getElementById("statScheduleCount").textContent = studentSchedules.length;
-            document.getElementById("statBooksCount").textContent = booksNeeded.length;
-            document.getElementById("statPackedCount").textContent = packedCount;
-            document.getElementById("statFirstClassTime").textContent = studentSchedules.length > 0 ? studentSchedules[0].start : "-";
+            document.getElementById('selectedDayHeader').textContent = `Jadual Waktu (${DAYS_MAP[selectedDay]})`;
         }
 
-        function renderDaysTabs() {
-            const container = document.getElementById("daysTab");
-            container.innerHTML = DAYS.map(day => {
-                const scheduleCount = getStudentSchedulesForDay(day.id).length;
-                return `
-                    <div class="day-btn ${activeDay === day.id ? 'active' : ''}" onclick="switchDay(${day.id})">
-                        <strong>${day.name}</strong>
-                        <small>${scheduleCount} subjek</small>
-                    </div>
-                `;
-            }).join("");
-        }
+        function renderSchedule() {
+            const container = document.getElementById('scheduleContainer');
+            container.innerHTML = '';
 
-        function getStudentSchedulesForDay(dayId) {
-            const student = getActiveStudent();
-            if (!student) return [];
-            return state.schedules
-                .filter(s => s.studentId === student.id && Number(s.day) === dayId)
-                .sort((a, b) => a.start.localeCompare(b.start));
-        }
-
-        function getStudentCocurricular() {
-            const student = getActiveStudent();
-            if (!student) return [];
-            return (state.cocurricular || []).filter(c => c.studentId === student.id);
-        }
-
-        function getStudentCocurricularForDay(dayId) {
-            return getStudentCocurricular()
-                .filter(c => Number(c.day) === dayId)
-                .sort((a, b) => (a.start || "").localeCompare(b.start || ""));
-        }
-
-        function renderScheduleList() {
-            const schedules = getStudentSchedulesForDay(activeDay);
-            const dayName = DAYS.find(d => d.id === activeDay)?.name || "";
-            document.getElementById("selectedDayHeader").textContent = `📅 Jadual Hari ${dayName}`;
-
-            const container = document.getElementById("scheduleContainer");
-
-            if (!getActiveStudent()) {
-                container.innerHTML = `
-                    <div class="empty-box">
-                        <div class="icon">👨‍👩‍👧</div>
-                        <h4>Sila Tambah Pelajar</h4>
-                        <p>Klik butang 'Tambah Pelajar' di sebelah kiri untuk bermula.</p>
-                    </div>
-                `;
+            const activeStudent = getActiveStudent();
+            if (!activeStudent) {
+                container.innerHTML = `<div class="empty-box"><div class="icon">👦</div><h4>Pilih atau Tambah Pelajar Baru</h4></div>`;
                 return;
             }
 
-            if (!schedules.length) {
+            const daySchedules = appData.schedules
+                .filter(s => s.studentId === activeStudent.id && parseInt(s.day) === selectedDay)
+                .sort((a, b) => (a.startTime || '').localeCompare(b.startTime || ''));
+
+            if (daySchedules.length === 0) {
                 container.innerHTML = `
                     <div class="empty-box">
-                        <div class="icon">🎉</div>
-                        <h4>Tiada Subjek Rekod</h4>
-                        <p>Tiada jadual waktu sekolah dimasukkan untuk hari ${dayName}. Anda boleh tekan 'Salin Hari Ini' dari hari lain.</p>
-                    </div>
-                `;
+                        <div class="icon">📅</div>
+                        <h4>Tiada Subjek Pada Hari ${DAYS_MAP[selectedDay]}</h4>
+                        <p style="font-size:0.85rem; color:var(--text-muted); margin-top:4px;">Klik 'Tambah Subjek' untuk memasukkan jadual pelajaran hari ini.</p>
+                    </div>`;
                 return;
             }
 
-            container.innerHTML = schedules.map(item => `
-                <div class="schedule-card type-${item.type || 'subjek'}">
+            daySchedules.forEach(item => {
+                const card = document.createElement('div');
+                card.className = `schedule-card type-${item.type || 'subjek'}`;
+
+                const booksList = item.books ? item.books.split(',').map(b => b.trim()).filter(Boolean) : [];
+                const booksHtml = booksList.map(b => `<span class="book-tag">📖 ${b}</span>`).join('');
+
+                card.innerHTML = `
                     <div class="schedule-header">
-                        <div>
-                            <div class="subject-title">
-                                ${getTypeEmoji(item.type)} ${escapeHtml(item.subject)}
-                            </div>
-                            ${item.note ? `<div class="schedule-note">💡 ${escapeHtml(item.note)}</div>` : ''}
+                        <div class="subject-title">
+                            ${getScheduleIcon(item.type)} ${item.subject}
                         </div>
-                        <div class="time-badge">
-                            ⏰ ${item.start} ${item.end ? '- ' + item.end : ''}
-                        </div>
+                        <span class="time-badge">⏰ ${item.startTime || '00:00'} - ${item.endTime || '00:00'}</span>
                     </div>
-                    ${item.books && item.books.length > 0 ? `
-                        <div class="books-tag-list">
-                            ${item.books.map(b => `<span class="book-tag">📖 ${escapeHtml(b)}</span>`).join("")}
+                    ${item.teacher || item.location ? `
+                        <div class="schedule-note">
+                            👨‍🏫 ${item.teacher || 'Tiada Guru'} ${item.location ? `• 🏫 ${item.location}` : ''}
                         </div>
                     ` : ''}
+                    ${booksList.length > 0 ? `<div class="books-tag-list">${booksHtml}</div>` : ''}
                     <div class="schedule-actions">
-                        <button class="btn btn-light btn-sm" onclick="duplicateSchedule('${item.id}')">📋 Duplikasi</button>
                         <button class="btn btn-light btn-sm" onclick="editSchedule('${item.id}')">✏️ Edit</button>
-                        <button class="btn btn-danger btn-sm" onclick="openConfirmDeleteSchedule('${item.id}')">🗑 Padam</button>
-                    </div>
-                </div>
-            `).join("");
-        }
-
-        function renderCocurricularList() {
-            const container = document.getElementById("cocurricularContainer");
-            const allCoco = getStudentCocurricular();
-
-            if (!getActiveStudent()) {
-                container.innerHTML = `<div class="empty-box"><p>Sila tambah/pilih pelajar dahulu.</p></div>`;
-                return;
-            }
-
-            if (!allCoco.length) {
-                container.innerHTML = `
-                    <div class="empty-box" style="padding: 15px 0;">
-                        <p style="font-size:0.85rem;">Tiada aktiviti kokurikulum didaftarkan.</p>
+                        <button class="btn btn-danger btn-sm" onclick="deleteSchedule('${item.id}')">🗑️ Padam</button>
                     </div>
                 `;
-                return;
-            }
-
-            container.innerHTML = allCoco.map(item => {
-                const dayName = DAYS.find(d => d.id === Number(item.day))?.name || "";
-                let badgeClass = "badge-persatuan";
-                let badgeIcon = "🎨 Kelab / Persatuan";
-
-                if (item.category === 'uniform') {
-                    badgeClass = "badge-uniform";
-                    badgeIcon = "⛺ Unit Beruniform";
-                } else if (item.category === 'sukan') {
-                    badgeClass = "badge-sukan";
-                    badgeIcon = "⚽ Sukan & Permainan";
-                }
-
-                return `
-                    <div class="cocurricular-card">
-                        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:8px;">
-                            <div>
-                                <span class="cocurricular-badge ${badgeClass}">${badgeIcon}</span>
-                                <h4 style="font-size:1rem; font-weight:800; margin-top:4px;">${escapeHtml(item.name)}</h4>
-                            </div>
-                            <div class="time-badge">
-                                📅 ${dayName} ${item.start ? '• ' + item.start : ''}
-                            </div>
-                        </div>
-
-                        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap:6px; font-size:0.8rem; color: var(--text-muted);">
-                            ${item.uniform ? `<div>👔 <strong>Uniform:</strong> ${escapeHtml(item.uniform)}</div>` : ''}
-                            ${item.location ? `<div>📍 <strong>Lokasi:</strong> ${escapeHtml(item.location)}</div>` : ''}
-                        </div>
-
-                        ${item.items && item.items.length > 0 ? `
-                            <div class="books-tag-list">
-                                ${item.items.map(gear => `<span class="book-tag" style="background:#e0f2fe; color:#0369a1;">🎒 ${escapeHtml(gear)}</span>`).join("")}
-                            </div>
-                        ` : ''}
-
-                        <div class="schedule-actions" style="margin-top:4px; padding-top:4px;">
-                            <button class="btn btn-light btn-sm" onclick="editCocurricular('${item.id}')">✏️ Edit</button>
-                            <button class="btn btn-danger btn-sm" onclick="openConfirmDeleteCocurricular('${item.id}')">🗑 Padam</button>
-                        </div>
-                    </div>
-                `;
-            }).join("");
+                container.appendChild(card);
+            });
         }
 
-        function getBooksForDay(dayId) {
-            const schedules = getStudentSchedulesForDay(dayId);
-            const cocos = getStudentCocurricularForDay(dayId);
-            const student = getActiveStudent();
-            if (!student) return [];
-
-            const booksMap = [];
-
-            schedules.forEach(s => {
-                if (s.books && Array.isArray(s.books)) {
-                    s.books.forEach(b => {
-                        const key = `${student.id}_${s.id}_${b}`;
-                        booksMap.push({
-                            key: key,
-                            scheduleId: s.id,
-                            name: b,
-                            subject: s.subject,
-                            type: 'buku',
-                            packed: !!state.packedBooks[key]
-                        });
-                    });
-                }
-            });
-
-            cocos.forEach(c => {
-                if (c.uniform) {
-                    const uniformKey = `${student.id}_coco_${c.id}_uniform`;
-                    booksMap.push({
-                        key: uniformKey,
-                        scheduleId: c.id,
-                        name: `👔 ${c.uniform}`,
-                        subject: c.name,
-                        type: 'koko',
-                        packed: !!state.packedBooks[uniformKey]
-                    });
-                }
-                if (c.items && Array.isArray(c.items)) {
-                    c.items.forEach(gear => {
-                        const gearKey = `${student.id}_coco_${c.id}_${gear}`;
-                        booksMap.push({
-                            key: gearKey,
-                            scheduleId: c.id,
-                            name: gear,
-                            subject: c.name,
-                            type: 'koko',
-                            packed: !!state.packedBooks[gearKey]
-                        });
-                    });
-                }
-            });
-
-            return booksMap;
+        function getScheduleIcon(type) {
+            switch(type) {
+                case 'peperiksaan': return '📝';
+                case 'kokurikulum': return '🏃';
+                case 'aktiviti': return '🎯';
+                default: return '📚';
+            }
         }
 
         function renderBagChecklist() {
-            const books = getBooksForDay(activeDay);
-            const container = document.getElementById("bagGrid");
-            const progressBar = document.getElementById("bagProgressBar");
+            const grid = document.getElementById('bagGrid');
+            const progressBar = document.getElementById('bagProgressBar');
+            grid.innerHTML = '';
 
-            if (!books.length) {
-                container.innerHTML = `<div class="empty-box" style="grid-column: 1/-1;"><p>Tiada buku diperlukan untuk hari ini.</p></div>`;
+            const activeStudent = getActiveStudent();
+            if (!activeStudent) {
+                grid.innerHTML = `<div class="empty-box" style="grid-column:1/-1;">Sila pilih pelajar dahulu</div>`;
                 progressBar.style.width = '0%';
                 return;
             }
 
-            const packedCount = books.filter(b => b.packed).length;
-            const percentage = Math.round((packedCount / books.length) * 100);
-            progressBar.style.width = `${percentage}%`;
+            // Extract books/items for today's schedule
+            const daySchedules = appData.schedules.filter(s => s.studentId === activeStudent.id && parseInt(s.day) === selectedDay);
+            let items = [];
 
-            container.innerHTML = books.map(book => `
-                <div class="bag-item ${book.packed ? 'packed' : ''}">
+            daySchedules.forEach(s => {
+                if (s.books) {
+                    const parsed = s.books.split(',').map(b => b.trim()).filter(Boolean);
+                    items.push(...parsed);
+                } else {
+                    items.push(`Buku ${s.subject}`);
+                }
+            });
+
+            // Unique items
+            items = [...new Set(items)];
+
+            if (items.length === 0) {
+                grid.innerHTML = `<div class="empty-box" style="grid-column:1/-1;"><p style="font-size:0.85rem;">Tiada barangan/buku yang perlu di-pack untuk hari ${DAYS_MAP[selectedDay]}.</p></div>`;
+                progressBar.style.width = '0%';
+                return;
+            }
+
+            let packedCount = 0;
+
+            items.forEach(item => {
+                const key = `${activeStudent.id}_${selectedDay}_${item}`;
+                const isPacked = !!appData.packedState[key];
+                if (isPacked) packedCount++;
+
+                const bagCard = document.createElement('div');
+                bagCard.className = `bag-item ${isPacked ? 'packed' : ''}`;
+                bagCard.innerHTML = `
                     <label>
-                        <input type="checkbox" ${book.packed ? 'checked' : ''} onchange="toggleBookPacked('${escapeAttribute(book.key)}')">
-                        <span>${escapeHtml(book.name)}</span>
+                        <input type="checkbox" ${isPacked ? 'checked' : ''} onchange="togglePackItem('${key}')">
+                        <span>${item}</span>
                     </label>
-                    <span style="font-size:0.75rem; color: var(--text-muted);">${book.type === 'koko' ? '🏃 Kokurikulum' : '📚 Subjek'}: ${escapeHtml(book.subject)}</span>
-                </div>
-            `).join("");
+                `;
+                grid.appendChild(bagCard);
+            });
+
+            const percent = Math.round((packedCount / items.length) * 100);
+            progressBar.style.width = `${percent}%`;
         }
 
-        function toggleBookPacked(key) {
-            state.packedBooks[key] = !state.packedBooks[key];
-            saveState();
-            renderHeroStats();
+        function togglePackItem(key) {
+            appData.packedState[key] = !appData.packedState[key];
+            saveAppData();
             renderBagChecklist();
+            renderStats();
         }
 
         function packAllBooks() {
-            const books = getBooksForDay(activeDay);
-            if (!books.length) return;
+            const activeStudent = getActiveStudent();
+            if (!activeStudent) return;
 
-            books.forEach(b => {
-                state.packedBooks[b.key] = true;
+            const daySchedules = appData.schedules.filter(s => s.studentId === activeStudent.id && parseInt(s.day) === selectedDay);
+            daySchedules.forEach(s => {
+                const books = s.books ? s.books.split(',').map(b => b.trim()).filter(Boolean) : [`Buku ${s.subject}`];
+                books.forEach(b => {
+                    const key = `${activeStudent.id}_${selectedDay}_${b}`;
+                    appData.packedState[key] = true;
+                });
             });
-            saveState();
-            renderHeroStats();
+
+            saveAppData();
             renderBagChecklist();
-            showToast("Semua buku & barangan untuk hari ini ditandakan siap! 🎒");
+            renderStats();
+            showToast("Semua barang & buku telah siap dimasukkan ke dalam beg! 🎒");
         }
 
-        function renderTaskList() {
-            const student = getActiveStudent();
-            const container = document.getElementById("taskList");
+        function renderTasks() {
+            const container = document.getElementById('taskList');
+            container.innerHTML = '';
 
-            if (!student) {
-                container.innerHTML = `<div class="empty-box"><p>Sila tambah/pilih pelajar dahulu.</p></div>`;
+            const activeStudent = getActiveStudent();
+            if (!activeStudent) return;
+
+            const studentTasks = appData.tasks.filter(t => t.studentId === activeStudent.id);
+
+            if (studentTasks.length === 0) {
+                container.innerHTML = `<div class="empty-box" style="padding:16px;"><p style="font-size:0.85rem;">Tiada tugasan/kerja rumah terkini.</p></div>`;
                 return;
             }
 
-            const studentTasks = (state.tasks || []).filter(t => t.studentId === student.id);
-
-            if (!studentTasks.length) {
-                container.innerHTML = `<div class="empty-box" style="padding:15px;"><p>Tiada kerja rumah atau tugasan belum selesai. 🎉</p></div>`;
-                return;
-            }
-
-            container.innerHTML = studentTasks.map(t => `
-                <div class="task-item ${t.completed ? 'completed' : ''}">
+            studentTasks.forEach(task => {
+                const div = document.createElement('div');
+                div.className = `task-item ${task.completed ? 'completed' : ''}`;
+                div.innerHTML = `
                     <div style="display:flex; align-items:center; gap:10px;">
-                        <input type="checkbox" ${t.completed ? 'checked' : ''} onchange="toggleTaskDone('${t.id}')" style="width:18px; height:18px; accent-color:var(--primary);">
+                        <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask('${task.id}')" style="width:18px; height:18px; accent-color:var(--primary);">
                         <div>
-                            <strong>${escapeHtml(t.title)}</strong>
-                            <div style="font-size:0.75rem; color:var(--text-muted);">Tarikh Hantar: ${t.dueDate}</div>
+                            <strong style="font-size:0.9rem;">${task.title}</strong>
+                            <small style="display:block; color:var(--text-muted);">${task.subject ? `[${task.subject}]` : ''} ${task.dueDate ? `Tarikh: ${task.dueDate}` : ''}</small>
                         </div>
                     </div>
-                    <button class="btn btn-light btn-sm" onclick="deleteTask('${t.id}')">🗑</button>
-                </div>
-            `).join("");
+                    <button class="btn btn-danger btn-sm" onclick="deleteTask('${task.id}')">🗑️</button>
+                `;
+                container.appendChild(div);
+            });
         }
 
-        function toggleTaskDone(taskId) {
-            const task = state.tasks.find(t => t.id === taskId);
+        function toggleTask(id) {
+            const task = appData.tasks.find(t => t.id === id);
             if (task) {
                 task.completed = !task.completed;
-                saveState();
-                renderTaskList();
+                saveAppData();
+                renderTasks();
             }
         }
 
-        function deleteTask(taskId) {
-            state.tasks = state.tasks.filter(t => t.id !== taskId);
-            saveState();
-            renderTaskList();
-            showToast("Tugasan dipadam.");
+        function renderCocurricular() {
+            const container = document.getElementById('cocurricularContainer');
+            container.innerHTML = '';
+
+            const activeStudent = getActiveStudent();
+            if (!activeStudent) return;
+
+            const studentCoco = appData.cocurricular.filter(c => c.studentId === activeStudent.id);
+
+            if (studentCoco.length === 0) {
+                container.innerHTML = `<div class="empty-box" style="padding:16px;"><p style="font-size:0.85rem;">Tiada pendaftaran aktiviti ko-kurikulum.</p></div>`;
+                return;
+            }
+
+            studentCoco.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'cocurricular-card';
+
+                let badgeClass = 'badge-persatuan';
+                if (item.category === 'uniform') badgeClass = 'badge-uniform';
+                if (item.category === 'sukan') badgeClass = 'badge-sukan';
+
+                card.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span class="cocurricular-badge ${badgeClass}">${item.category || 'Aktiviti'}</span>
+                        <div style="display:flex; gap:4px;">
+                            <button class="btn btn-light btn-sm" onclick="editCocurricular('${item.id}')">✏️</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteCocurricular('${item.id}')">🗑️</button>
+                        </div>
+                    </div>
+                    <h4 style="font-weight:800; font-size:1.05rem;">${item.name}</h4>
+                    <p style="font-size:0.85rem; color:var(--text-muted);">
+                        📅 Hari: <strong>${DAYS_MAP[item.day] || 'Rabu'}</strong> • ⏰ Masa: ${item.time || '-'}
+                    </p>
+                    ${item.venue ? `<p style="font-size:0.8rem; color:var(--text-muted);">📍 Tempat: ${item.venue}</p>` : ''}
+                    ${item.notes ? `<p style="font-size:0.8rem; background:#fff; padding:6px 10px; border-radius:8px; border:1px solid var(--card-border);">👕 Keperluan: ${item.notes}</p>` : ''}
+                `;
+                container.appendChild(card);
+            });
         }
 
-        /* ============================================================
-           STUDENT ACTIONS & AVATAR HANDLING
-        ============================================================ */
-        function openStudentModal() {
-            document.getElementById("studentEditId").value = "";
-            document.getElementById("studentName").value = "";
-            document.getElementById("studentLevel").value = "";
-            document.getElementById("studentSchool").value = "";
-            document.getElementById("studentAvatarBase64").value = "";
-            document.getElementById("studentAvatarFile").value = "";
-            document.getElementById("avatarPreviewBox").innerHTML = "👤";
-            document.getElementById("studentModalTitle").textContent = "👦 Tambah Pelajar Baru";
-            showModal("studentModal");
-        }
+        function renderStats() {
+            const activeStudent = getActiveStudent();
+            if (!activeStudent) {
+                document.getElementById('statScheduleCount').textContent = '0';
+                document.getElementById('statBooksCount').textContent = '0';
+                document.getElementById('statPackedCount').textContent = '0%';
+                document.getElementById('statFirstClassTime').textContent = '-';
+                return;
+            }
 
-        function openEditStudentModal(id) {
-            const student = state.students.find(s => s.id === id);
-            if (!student) return;
+            const daySchedules = appData.schedules.filter(s => s.studentId === activeStudent.id && parseInt(s.day) === selectedDay);
+            document.getElementById('statScheduleCount').textContent = daySchedules.length;
 
-            document.getElementById("studentEditId").value = student.id;
-            document.getElementById("studentName").value = student.name;
-            document.getElementById("studentLevel").value = student.level || "";
-            document.getElementById("studentSchool").value = student.school || "";
-            document.getElementById("studentAvatarBase64").value = student.avatarData || "";
-            document.getElementById("studentAvatarFile").value = "";
+            let totalItems = 0;
+            let packedItems = 0;
 
-            const preview = document.getElementById("avatarPreviewBox");
-            if (student.avatarData) {
-                preview.innerHTML = `<img src="${student.avatarData}" alt="Avatar">`;
+            daySchedules.forEach(s => {
+                const books = s.books ? s.books.split(',').map(b => b.trim()).filter(Boolean) : [`Buku ${s.subject}`];
+                books.forEach(b => {
+                    totalItems++;
+                    const key = `${activeStudent.id}_${selectedDay}_${b}`;
+                    if (appData.packedState[key]) packedItems++;
+                });
+            });
+
+            document.getElementById('statBooksCount').textContent = `${packedItems}/${totalItems}`;
+            const percent = totalItems > 0 ? Math.round((packedItems / totalItems) * 100) : 0;
+            document.getElementById('statPackedCount').textContent = `${percent}%`;
+
+            if (daySchedules.length > 0) {
+                const sorted = [...daySchedules].sort((a, b) => (a.startTime || '').localeCompare(b.startTime || ''));
+                document.getElementById('statFirstClassTime').textContent = sorted[0].startTime || '-';
             } else {
-                preview.innerHTML = student.name.charAt(0).toUpperCase();
+                document.getElementById('statFirstClassTime').textContent = '-';
+            }
+        }
+
+        // STUDENT MODAL & CRUD
+        function openStudentModal(id = null) {
+            document.getElementById('studentEditId').value = id || '';
+            document.getElementById('studentModalTitle').textContent = id ? '✏️ Edit Profil Pelajar' : '👦 Tambah Pelajar';
+            
+            if (id) {
+                const s = appData.students.find(x => x.id === id);
+                if (s) {
+                    document.getElementById('studentName').value = s.name;
+                    document.getElementById('studentLevel').value = s.level || '';
+                    document.getElementById('studentSchool').value = s.school || '';
+                    document.getElementById('studentAvatarBase64').value = s.avatarUrl || '';
+                    if (s.avatarUrl) {
+                        document.getElementById('avatarPreviewBox').innerHTML = `<img src="${s.avatarUrl}">`;
+                    } else {
+                        document.getElementById('avatarPreviewBox').innerHTML = '👤';
+                    }
+                }
+            } else {
+                document.getElementById('studentName').value = '';
+                document.getElementById('studentLevel').value = '';
+                document.getElementById('studentSchool').value = '';
+                document.getElementById('studentAvatarBase64').value = '';
+                document.getElementById('avatarPreviewBox').innerHTML = '👤';
             }
 
-            document.getElementById("studentModalTitle").textContent = "✏️ Edit Profil Pelajar";
-            showModal("studentModal");
+            openModal('studentModal');
         }
 
         function previewStudentAvatar(event) {
             const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = new Image();
-                img.onload = function() {
-                    const canvas = document.createElement("canvas");
-                    const ctx = canvas.getContext("2d");
-                    const maxDim = 200;
-                    let width = img.width;
-                    let height = img.height;
-
-                    if (width > height) {
-                        if (width > maxDim) {
-                            height *= maxDim / width;
-                            width = maxDim;
-                        }
-                    } else {
-                        if (height > maxDim) {
-                            width *= maxDim / height;
-                            height = maxDim;
-                        }
-                    }
-
-                    canvas.width = width;
-                    canvas.height = height;
-                    ctx.drawImage(img, 0, 0, width, height);
-
-                    const compressedBase64 = canvas.toDataURL("image/jpeg", 0.85);
-                    document.getElementById("studentAvatarBase64").value = compressedBase64;
-                    document.getElementById("avatarPreviewBox").innerHTML = `<img src="${compressedBase64}" alt="Avatar">`;
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const base64 = e.target.result;
+                    document.getElementById('studentAvatarBase64').value = base64;
+                    document.getElementById('avatarPreviewBox').innerHTML = `<img src="${base64}">`;
                 };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
+                reader.readAsDataURL(file);
+            }
         }
 
         function saveStudentForm(event) {
             event.preventDefault();
-            const editId = document.getElementById("studentEditId").value;
-            const name = document.getElementById("studentName").value.trim();
-            const level = document.getElementById("studentLevel").value.trim();
-            const school = document.getElementById("studentSchool").value.trim();
-            const avatarData = document.getElementById("studentAvatarBase64").value;
+            const id = document.getElementById('studentEditId').value;
+            const name = document.getElementById('studentName').value.trim();
+            const level = document.getElementById('studentLevel').value.trim();
+            const school = document.getElementById('studentSchool').value.trim();
+            const avatarUrl = document.getElementById('studentAvatarBase64').value;
 
-            if (!name) return;
-
-            if (editId) {
-                const index = state.students.findIndex(s => s.id === editId);
-                if (index !== -1) {
-                    state.students[index] = {
-                        ...state.students[index],
-                        name, level, school, avatarData
-                    };
+            if (id) {
+                const student = appData.students.find(s => s.id === id);
+                if (student) {
+                    student.name = name;
+                    student.level = level;
+                    student.school = school;
+                    student.avatarUrl = avatarUrl;
                 }
-                showToast(`Profil ${name} telah dikemaskini!`);
             } else {
                 const newStudent = {
-                    id: generateId(),
-                    name, level, school, avatarData
+                    id: 'std_' + Date.now(),
+                    name,
+                    level,
+                    school,
+                    avatarUrl
                 };
-                state.students.push(newStudent);
-                if (!state.activeStudentId) {
-                    state.activeStudentId = newStudent.id;
-                }
-                showToast(`Pelajar ${name} berjaya disimpan!`);
+                appData.students.push(newStudent);
+                appData.activeStudentId = newStudent.id;
             }
 
-            saveState();
-            closeModal("studentModal");
+            saveAppData();
+            closeModal('studentModal');
             renderAll();
+            showToast("Profil pelajar berjaya disimpan!");
         }
 
-        function switchStudent(id) {
-            state.activeStudentId = id;
-            saveState();
-            renderAll();
+        function editStudent(id) {
+            openStudentModal(id);
         }
 
-        function openConfirmDeleteStudent(id) {
-            const student = state.students.find(s => s.id === id);
-            if (!student) return;
-
-            document.getElementById("confirmTitle").textContent = "Padam Pelajar?";
-            document.getElementById("confirmMessage").textContent = `Adakah anda pasti mahu memadam profil ${student.name}? Semua jadual waktu pelajar ini akan dipadam.`;
-            document.getElementById("confirmActionButton").onclick = () => {
-                state.students = state.students.filter(s => s.id !== id);
-                state.schedules = state.schedules.filter(s => s.studentId !== id);
-                state.cocurricular = (state.cocurricular || []).filter(c => c.studentId !== id);
-                if (state.activeStudentId === id) {
-                    state.activeStudentId = state.students.length > 0 ? state.students[0].id : null;
+        function deleteStudent(id) {
+            if (confirm("Adakah anda pasti mahu memadam profil pelajar ini?")) {
+                appData.students = appData.students.filter(s => s.id !== id);
+                if (appData.activeStudentId === id) {
+                    appData.activeStudentId = appData.students[0] ? appData.students[0].id : null;
                 }
-                saveState();
-                closeModal("confirmModal");
+                saveAppData();
                 renderAll();
-                showToast("Profil pelajar dipadam.");
-            };
-            showModal("confirmModal");
+                showToast("Pelajar dipadam.");
+            }
         }
 
-        /* ============================================================
-           SCHEDULE ACTIONS
-        ============================================================ */
-        function switchDay(dayId) {
-            activeDay = dayId;
-            renderDaysTabs();
-            renderHeroStats();
-            renderScheduleList();
-            renderBagChecklist();
-        }
-
-        function openScheduleModal() {
-            if (!getActiveStudent()) {
-                showToast("Sila tambah pelajar dahulu!");
+        // SCHEDULE MODAL & CRUD
+        function openScheduleModal(id = null) {
+            const activeStudent = getActiveStudent();
+            if (!activeStudent) {
+                alert("Sila tambah profil pelajar terlebih dahulu.");
                 openStudentModal();
                 return;
             }
 
-            document.getElementById("scheduleEditId").value = "";
-            document.getElementById("scheduleDay").value = String(activeDay);
-            document.getElementById("scheduleSubject").value = "";
-            document.getElementById("scheduleStart").value = "";
-            document.getElementById("scheduleEnd").value = "";
-            document.getElementById("scheduleBooks").value = "";
-            document.getElementById("scheduleNote").value = "";
-            document.getElementById("scheduleReminder").value = "10";
-            document.getElementById("scheduleType").value = "subjek";
+            document.getElementById('scheduleEditId').value = id || '';
+            document.getElementById('scheduleModalTitle').textContent = id ? '✏️ Edit Subjek' : '📚 Tambah Subjek';
 
-            document.getElementById("scheduleModalTitle").textContent = "📚 Tambah Subjek Jadual";
-            showModal("scheduleModal");
+            if (id) {
+                const s = appData.schedules.find(x => x.id === id);
+                if (s) {
+                    document.getElementById('scheduleDay').value = s.day;
+                    document.getElementById('scheduleType').value = s.type || 'subjek';
+                    document.getElementById('scheduleSubject').value = s.subject;
+                    document.getElementById('scheduleStartTime').value = s.startTime;
+                    document.getElementById('scheduleEndTime').value = s.endTime;
+                    document.getElementById('scheduleTeacher').value = s.teacher || '';
+                    document.getElementById('scheduleLocation').value = s.location || '';
+                    document.getElementById('scheduleBooks').value = s.books || '';
+                }
+            } else {
+                document.getElementById('scheduleDay').value = selectedDay;
+                document.getElementById('scheduleType').value = 'subjek';
+                document.getElementById('scheduleSubject').value = '';
+                document.getElementById('scheduleStartTime').value = '07:30';
+                document.getElementById('scheduleEndTime').value = '08:30';
+                document.getElementById('scheduleTeacher').value = '';
+                document.getElementById('scheduleLocation').value = '';
+                document.getElementById('scheduleBooks').value = '';
+            }
+
+            openModal('scheduleModal');
         }
 
         function saveScheduleForm(event) {
             event.preventDefault();
-            const student = getActiveStudent();
-            if (!student) return;
+            const activeStudent = getActiveStudent();
+            if (!activeStudent) return;
 
-            const editId = document.getElementById("scheduleEditId").value;
-            const day = Number(document.getElementById("scheduleDay").value);
-            const subject = document.getElementById("scheduleSubject").value.trim();
-            const start = document.getElementById("scheduleStart").value;
-            const end = document.getElementById("scheduleEnd").value;
-            const booksRaw = document.getElementById("scheduleBooks").value;
-            const note = document.getElementById("scheduleNote").value.trim();
-            const reminder = Number(document.getElementById("scheduleReminder").value);
-            const type = document.getElementById("scheduleType").value;
+            const id = document.getElementById('scheduleEditId').value;
+            const day = document.getElementById('scheduleDay').value;
+            const type = document.getElementById('scheduleType').value;
+            const subject = document.getElementById('scheduleSubject').value.trim();
+            const startTime = document.getElementById('scheduleStartTime').value;
+            const endTime = document.getElementById('scheduleEndTime').value;
+            const teacher = document.getElementById('scheduleTeacher').value.trim();
+            const location = document.getElementById('scheduleLocation').value.trim();
+            const books = document.getElementById('scheduleBooks').value.trim();
 
-            const books = booksRaw.split(",").map(b => b.trim()).filter(Boolean);
-
-            if (editId) {
-                const index = state.schedules.findIndex(s => s.id === editId);
-                if (index !== -1) {
-                    state.schedules[index] = {
-                        ...state.schedules[index],
-                        day, subject, start, end, books, note, reminder, type
-                    };
+            if (id) {
+                const item = appData.schedules.find(s => s.id === id);
+                if (item) {
+                    item.day = day;
+                    item.type = type;
+                    item.subject = subject;
+                    item.startTime = startTime;
+                    item.endTime = endTime;
+                    item.teacher = teacher;
+                    item.location = location;
+                    item.books = books;
                 }
             } else {
-                state.schedules.push({
-                    id: generateId(),
-                    studentId: student.id,
-                    day, subject, start, end, books, note, reminder, type
+                appData.schedules.push({
+                    id: 'sch_' + Date.now(),
+                    studentId: activeStudent.id,
+                    day,
+                    type,
+                    subject,
+                    startTime,
+                    endTime,
+                    teacher,
+                    location,
+                    books
                 });
             }
 
-            saveState();
-            closeModal("scheduleModal");
-            renderAll();
-            showToast("Jadual berjaya disimpan!");
+            saveAppData();
+            closeModal('scheduleModal');
+            renderSchedule();
+            renderBagChecklist();
+            renderStats();
+            renderDaysTab();
+            showToast("Jadual subjek berjaya disimpan!");
         }
 
         function editSchedule(id) {
-            const item = state.schedules.find(s => s.id === id);
-            if (!item) return;
-
-            document.getElementById("scheduleEditId").value = item.id;
-            document.getElementById("scheduleDay").value = String(item.day);
-            document.getElementById("scheduleSubject").value = item.subject;
-            document.getElementById("scheduleStart").value = item.start;
-            document.getElementById("scheduleEnd").value = item.end || "";
-            document.getElementById("scheduleBooks").value = (item.books || []).join(", ");
-            document.getElementById("scheduleNote").value = item.note || "";
-            document.getElementById("scheduleReminder").value = String(item.reminder ?? 10);
-            document.getElementById("scheduleType").value = item.type || "subjek";
-
-            document.getElementById("scheduleModalTitle").textContent = "✏️ Edit Subjek";
-            showModal("scheduleModal");
+            openScheduleModal(id);
         }
 
-        function openConfirmDeleteSchedule(id) {
-            document.getElementById("confirmTitle").textContent = "Padam Subjek?";
-            document.getElementById("confirmMessage").textContent = "Adakah anda pasti mahu memadam subjek ini daripada jadual?";
-            document.getElementById("confirmActionButton").onclick = () => {
-                state.schedules = state.schedules.filter(s => s.id !== id);
-                saveState();
-                closeModal("confirmModal");
-                renderAll();
+        function deleteSchedule(id) {
+            if (confirm("Adakah anda pasti mahu memadam subjek ini?")) {
+                appData.schedules = appData.schedules.filter(s => s.id !== id);
+                saveAppData();
+                renderSchedule();
+                renderBagChecklist();
+                renderStats();
+                renderDaysTab();
                 showToast("Subjek dipadam.");
-            };
-            showModal("confirmModal");
+            }
         }
 
-        /* ============================================================
-           SCHEDULE DUPLICATION & DAY COPYING
-        ============================================================ */
-        function duplicateSchedule(id) {
-            const original = state.schedules.find(s => s.id === id);
-            if (!original) return;
-
-            const copy = {
-                ...JSON.parse(JSON.stringify(original)),
-                id: generateId(),
-                subject: `${original.subject} (Salinan)`
-            };
-
-            state.schedules.push(copy);
-            saveState();
-            renderAll();
-            showToast(`Subjek "${original.subject}" berjaya didplikasi!`);
-        }
-
+        // COPY DAY SCHEDULE
         function openCopyDayModal() {
-            const student = getActiveStudent();
-            if (!student) {
-                showToast("Sila pilih/tambah pelajar dahulu.");
-                return;
-            }
-
-            const currentSchedules = getStudentSchedulesForDay(activeDay);
-            if (!currentSchedules.length) {
-                showToast("Tiada jadual pada hari ini untuk disalin.");
-                return;
-            }
-
-            const dayName = DAYS.find(d => d.id === activeDay)?.name || "";
-            document.getElementById("copySourceDayName").textContent = dayName;
-
-            const targetContainer = document.getElementById("targetDaysContainer");
-            targetContainer.innerHTML = DAYS
-                .filter(d => d.id !== activeDay)
-                .map(d => `
-                    <label style="display:flex; align-items:center; gap:6px; background:#f8fafc; padding:8px; border-radius:var(--radius-sm); border:1px solid var(--card-border); cursor:pointer; font-size:0.85rem; font-weight:600;">
-                        <input type="checkbox" name="copyTargetDays" value="${d.id}" style="accent-color:var(--primary); width:16px; height:16px;">
-                        <span>${d.name}</span>
-                    </label>
-                `).join("");
-
-            document.getElementById("overwriteTargetDays").checked = false;
-            showModal("copyDayModal");
+            document.getElementById('copyFromDayName').textContent = DAYS_MAP[selectedDay];
+            openModal('copyDayModal');
         }
 
-        function executeCopyDay(event) {
-            event.preventDefault();
-            const student = getActiveStudent();
-            if (!student) return;
+        function confirmCopyDay() {
+            const targetDay = document.getElementById('copyToDaySelect').value;
+            const activeStudent = getActiveStudent();
+            if (!activeStudent) return;
 
-            const checkboxes = document.querySelectorAll('input[name="copyTargetDays"]:checked');
-            const targetDayIds = Array.from(checkboxes).map(cb => Number(cb.value));
-
-            if (!targetDayIds.length) {
-                showToast("Sila pilih sekurang-kurangnya satu hari sasaran.");
+            if (parseInt(targetDay) === selectedDay) {
+                alert("Hari sasaran tidak boleh sama dengan hari asal.");
                 return;
             }
 
-            const sourceSchedules = getStudentSchedulesForDay(activeDay);
-            const shouldOverwrite = document.getElementById("overwriteTargetDays").checked;
+            const sourceSchedules = appData.schedules.filter(s => s.studentId === activeStudent.id && parseInt(s.day) === selectedDay);
+            
+            if (sourceSchedules.length === 0) {
+                alert("Tiada jadual untuk disalin pada hari ini.");
+                return;
+            }
 
-            targetDayIds.forEach(targetDayId => {
-                if (shouldOverwrite) {
-                    state.schedules = state.schedules.filter(
-                        s => !(s.studentId === student.id && Number(s.day) === targetDayId)
-                    );
-                }
-
-                sourceSchedules.forEach(source => {
-                    state.schedules.push({
-                        ...JSON.parse(JSON.stringify(source)),
-                        id: generateId(),
-                        day: targetDayId
-                    });
+            sourceSchedules.forEach(s => {
+                appData.schedules.push({
+                    ...s,
+                    id: 'sch_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+                    day: targetDay
                 });
             });
 
-            saveState();
-            closeModal("copyDayModal");
-            renderAll();
-            showToast(`Jadual berjaya disalin ke ${targetDayIds.length} hari! 📋`);
+            saveAppData();
+            closeModal('copyDayModal');
+            renderDaysTab();
+            showToast(`Jadual berjaya disalin ke hari ${DAYS_MAP[targetDay]}!`);
         }
 
-        /* ============================================================
-           COCURRICULAR ACTIONS
-        ============================================================ */
-        function openCocurricularModal() {
-            if (!getActiveStudent()) {
-                showToast("Sila tambah pelajar dahulu!");
-                openStudentModal();
-                return;
-            }
-
-            document.getElementById("cocoEditId").value = "";
-            document.getElementById("cocoCategory").value = "uniform";
-            document.getElementById("cocoDay").value = String(activeDay || 3);
-            document.getElementById("cocoName").value = "";
-            document.getElementById("cocoStart").value = "14:30";
-            document.getElementById("cocoEnd").value = "16:30";
-            document.getElementById("cocoUniform").value = "";
-            document.getElementById("cocoRole").value = "Ahli";
-            document.getElementById("cocoLocation").value = "";
-            document.getElementById("cocoItems").value = "";
-
-            document.getElementById("cocoModalTitle").textContent = "🏃 Tambah Aktiviti Kokurikulum";
-            showModal("cocurricularModal");
-        }
-
-        function saveCocurricularForm(event) {
-            event.preventDefault();
-            const student = getActiveStudent();
-            if (!student) return;
-
-            const editId = document.getElementById("cocoEditId").value;
-            const category = document.getElementById("cocoCategory").value;
-            const day = Number(document.getElementById("cocoDay").value);
-            const name = document.getElementById("cocoName").value.trim();
-            const start = document.getElementById("cocoStart").value;
-            const end = document.getElementById("cocoEnd").value;
-            const uniform = document.getElementById("cocoUniform").value.trim();
-            const role = document.getElementById("cocoRole").value.trim();
-            const location = document.getElementById("cocoLocation").value.trim();
-            const itemsRaw = document.getElementById("cocoItems").value;
-
-            const items = itemsRaw.split(",").map(i => i.trim()).filter(Boolean);
-
-            if (!state.cocurricular) state.cocurricular = [];
-
-            if (editId) {
-                const idx = state.cocurricular.findIndex(c => c.id === editId);
-                if (idx !== -1) {
-                    state.cocurricular[idx] = {
-                        ...state.cocurricular[idx],
-                        category, day, name, start, end, uniform, role, location, items
-                    };
-                }
-            } else {
-                state.cocurricular.push({
-                    id: generateId(),
-                    studentId: student.id,
-                    category, day, name, start, end, uniform, role, location, items
-                });
-            }
-
-            saveState();
-            closeModal("cocurricularModal");
-            renderAll();
-            showToast("Aktiviti Kokurikulum disimpan!");
-        }
-
-        function editCocurricular(id) {
-            const coco = (state.cocurricular || []).find(c => c.id === id);
-            if (!coco) return;
-
-            document.getElementById("cocoEditId").value = coco.id;
-            document.getElementById("cocoCategory").value = coco.category || "uniform";
-            document.getElementById("cocoDay").value = String(coco.day);
-            document.getElementById("cocoName").value = coco.name || "";
-            document.getElementById("cocoStart").value = coco.start || "14:30";
-            document.getElementById("cocoEnd").value = coco.end || "16:30";
-            document.getElementById("cocoUniform").value = coco.uniform || "";
-            document.getElementById("cocoRole").value = coco.role || "";
-            document.getElementById("cocoLocation").value = coco.location || "";
-            document.getElementById("cocoItems").value = (coco.items || []).join(", ");
-
-            document.getElementById("cocoModalTitle").textContent = "✏️ Edit Aktiviti Kokurikulum";
-            showModal("cocurricularModal");
-        }
-
-        function openConfirmDeleteCocurricular(id) {
-            document.getElementById("confirmTitle").textContent = "Padam Kokurikulum?";
-            document.getElementById("confirmMessage").textContent = "Adakah anda pasti mahu memadam aktiviti kokurikulum ini?";
-            document.getElementById("confirmActionButton").onclick = () => {
-                state.cocurricular = (state.cocurricular || []).filter(c => c.id !== id);
-                saveState();
-                closeModal("confirmModal");
-                renderAll();
-                showToast("Aktiviti kokurikulum dipadam.");
-            };
-            showModal("confirmModal");
-        }
-
-        /* ============================================================
-           TASK ACTIONS
-        ============================================================ */
+        // TASK MODAL & FUNCTIONS
         function openTaskModal() {
-            if (!getActiveStudent()) {
-                showToast("Sila pilih/tambah pelajar dahulu.");
+            const activeStudent = getActiveStudent();
+            if (!activeStudent) {
+                alert("Sila tambah profil pelajar terlebih dahulu.");
                 return;
             }
-            document.getElementById("taskTitle").value = "";
-            document.getElementById("taskDueDate").valueAsDate = new Date();
-            showModal("taskModal");
+            document.getElementById('taskEditId').value = '';
+            document.getElementById('taskTitle').value = '';
+            document.getElementById('taskSubject').value = '';
+            document.getElementById('taskDueDate').value = '';
+            openModal('taskModal');
         }
 
         function saveTaskForm(event) {
             event.preventDefault();
-            const student = getActiveStudent();
-            if (!student) return;
+            const activeStudent = getActiveStudent();
+            if (!activeStudent) return;
 
-            const title = document.getElementById("taskTitle").value.trim();
-            const dueDate = document.getElementById("taskDueDate").value;
+            const title = document.getElementById('taskTitle').value.trim();
+            const subject = document.getElementById('taskSubject').value.trim();
+            const dueDate = document.getElementById('taskDueDate').value;
 
-            if (!state.tasks) state.tasks = [];
-            state.tasks.push({
-                id: generateId(),
-                studentId: student.id,
+            appData.tasks.push({
+                id: 'tsk_' + Date.now(),
+                studentId: activeStudent.id,
                 title,
+                subject,
                 dueDate,
                 completed: false
             });
 
-            saveState();
-            closeModal("taskModal");
-            renderTaskList();
-            showToast("Tugasan ditambah!");
+            saveAppData();
+            closeModal('taskModal');
+            renderTasks();
+            showToast("Tugasan baharu disimpan!");
         }
 
-        /* ============================================================
-           GEOLOCATION & NEARBY SCHOOLS
-        ============================================================ */
-        function findSchoolsNearMe() {
-            const status = document.getElementById("schoolStatus");
-            const results = document.getElementById("schoolResults");
+        function deleteTask(id) {
+            appData.tasks = appData.tasks.filter(t => t.id !== id);
+            saveAppData();
+            renderTasks();
+        }
 
-            if (!navigator.geolocation) {
-                status.textContent = "Geolocation tidak disokong oleh pelayar anda.";
+        // CO-CURRICULAR MODAL & FUNCTIONS
+        function openCocurricularModal(id = null) {
+            const activeStudent = getActiveStudent();
+            if (!activeStudent) {
+                alert("Sila tambah profil pelajar terlebih dahulu.");
                 return;
             }
-
-            status.textContent = "📍 Mendapatkan lokasi GPS peranti...";
-            results.innerHTML = "";
-
-            navigator.geolocation.getCurrentPosition(
-                pos => {
-                    const lat = pos.coords.latitude;
-                    const lon = pos.coords.longitude;
-                    fetchNearbySchools(lat, lon);
-                },
-                err => {
-                    status.textContent = "Gagal mendapatkan lokasi GPS. Sila izinkan akses lokasi.";
-                },
-                { enableHighAccuracy: true, timeout: 10000 }
-            );
-        }
-
-        async function fetchNearbySchools(lat, lon) {
-            const status = document.getElementById("schoolStatus");
-            const results = document.getElementById("schoolResults");
-            status.textContent = "🔎 Mencari sekolah terdekat via OpenStreetMap...";
-
-            const radius = 5000;
-            const overpassQuery = `
-                [out:json][timeout:25];
-                (
-                    node["amenity"="school"](around:${radius},${lat},${lon});
-                    way["amenity"="school"](around:${radius},${lat},${lon});
-                );
-                out center 15;
-            `;
-
-            try {
-                const res = await fetch("https://overpass-api.de/api/interpreter", {
-                    method: "POST",
-                    body: overpassQuery
-                });
-                const data = await res.json();
-                const elements = data.elements || [];
-
-                if (!elements.length) {
-                    status.textContent = "Tiada sekolah dijumpai dalam radius 5km.";
-                    return;
+            document.getElementById('cocoEditId').value = id || '';
+            
+            if (id) {
+                const item = appData.cocurricular.find(c => c.id === id);
+                if (item) {
+                    document.getElementById('cocoName').value = item.name;
+                    document.getElementById('cocoCategory').value = item.category;
+                    document.getElementById('cocoDay').value = item.day;
+                    document.getElementById('cocoTime').value = item.time || '';
+                    document.getElementById('cocoVenue').value = item.venue || '';
+                    document.getElementById('cocoNotes').value = item.notes || '';
                 }
+            } else {
+                document.getElementById('cocoName').value = '';
+                document.getElementById('cocoCategory').value = 'uniform';
+                document.getElementById('cocoDay').value = '3';
+                document.getElementById('cocoTime').value = '2:00 PM - 4:00 PM';
+                document.getElementById('cocoVenue').value = '';
+                document.getElementById('cocoNotes').value = '';
+            }
 
-                status.textContent = `Jumpa ${elements.length} sekolah berdekatan!`;
-                results.innerHTML = elements.map(item => {
-                    const name = item.tags.name || item.tags["name:ms"] || "Sekolah";
-                    const itemLat = item.lat || item.center?.lat;
-                    const itemLon = item.lon || item.center?.lon;
-                    const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${itemLat},${itemLon}`;
+            openModal('cocurricularModal');
+        }
 
-                    return `
-                        <div class="school-card">
-                            <h4>🏫 ${escapeHtml(name)}</h4>
-                            <p>${item.tags["addr:street"] || item.tags["addr:city"] || "Lokasi dikesan"}</p>
-                            <div class="school-links">
-                                <a href="${mapsUrl}" target="_blank" class="btn btn-light btn-sm">🗺 Open Maps</a>
-                                <button class="btn btn-secondary btn-sm" onclick="assignSchoolToStudent('${escapeAttribute(name)}')">
-                                    Pilih Sekolah Ini
-                                </button>
+        function saveCocurricularForm(event) {
+            event.preventDefault();
+            const activeStudent = getActiveStudent();
+            if (!activeStudent) return;
+
+            const id = document.getElementById('cocoEditId').value;
+            const name = document.getElementById('cocoName').value.trim();
+            const category = document.getElementById('cocoCategory').value;
+            const day = document.getElementById('cocoDay').value;
+            const time = document.getElementById('cocoTime').value.trim();
+            const venue = document.getElementById('cocoVenue').value.trim();
+            const notes = document.getElementById('cocoNotes').value.trim();
+
+            if (id) {
+                const item = appData.cocurricular.find(c => c.id === id);
+                if (item) {
+                    item.name = name;
+                    item.category = category;
+                    item.day = day;
+                    item.time = time;
+                    item.venue = venue;
+                    item.notes = notes;
+                }
+            } else {
+                appData.cocurricular.push({
+                    id: 'coco_' + Date.now(),
+                    studentId: activeStudent.id,
+                    name,
+                    category,
+                    day,
+                    time,
+                    venue,
+                    notes
+                });
+            }
+
+            saveAppData();
+            closeModal('cocurricularModal');
+            renderCocurricular();
+            showToast("Aktiviti ko-kurikulum disimpan!");
+        }
+
+        function editCocurricular(id) {
+            openCocurricularModal(id);
+        }
+
+        function deleteCocurricular(id) {
+            if (confirm("Padam aktiviti ko-kurikulum ini?")) {
+                appData.cocurricular = appData.cocurricular.filter(c => c.id !== id);
+                saveAppData();
+                renderCocurricular();
+            }
+        }
+
+        // NEARBY SCHOOLS SEARCH
+        function findSchoolsNearMe() {
+            const statusBox = document.getElementById('schoolStatus');
+            const resultsBox = document.getElementById('schoolResults');
+            statusBox.textContent = "Sedang mendapatkan lokasi peranti...";
+            resultsBox.innerHTML = '';
+
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(
+                    position => {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        statusBox.textContent = `📍 Lokasi ditemui (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
+
+                        const mapsSearchUrl = `https://www.google.com/maps/search/sekolah/@${lat},${lng},14z`;
+
+                        resultsBox.innerHTML = `
+                            <div class="school-card">
+                                <h4>Sekolah Berdekatan Anda</h4>
+                                <p>Klik pautan di bawah untuk membuka carian peta sekolah berhampiran lokasi semasa anda.</p>
+                                <div class="school-links">
+                                    <a href="${mapsSearchUrl}" target="_blank" class="btn btn-primary btn-sm btn-full">
+                                        🗺️ Buka Carian Google Maps
+                                    </a>
+                                </div>
                             </div>
-                        </div>
-                    `;
-                }).join("");
-
-            } catch (error) {
-                status.textContent = "Ralat semasa mengambil data sekolah. Sila cuba lagi.";
+                        `;
+                    },
+                    error => {
+                        statusBox.textContent = "Gagal mengakses lokasi peranti. Menunjukkan pautan carian am.";
+                        resultsBox.innerHTML = `
+                            <div class="school-card">
+                                <h4>Cari Sekolah di Malaysia</h4>
+                                <p>Akses lokasi dinafikan atau tidak disokong. Buka Google Maps secara manual.</p>
+                                <a href="https://www.google.com/maps/search/sekolah+rendah+menengah" target="_blank" class="btn btn-secondary btn-sm btn-full">
+                                    🔍 Cari Sekolah di Google Maps
+                                </a>
+                            </div>
+                        `;
+                    }
+                );
+            } else {
+                statusBox.textContent = "Lokasi tidak disokong pada pelayar ini.";
             }
         }
 
-        function assignSchoolToStudent(schoolName) {
-            const student = getActiveStudent();
-            if (!student) {
-                showToast("Sila pilih pelajar dahulu.");
-                return;
-            }
-
-            student.school = schoolName;
-            saveState();
-            renderStudents();
-            showToast(`Sekolah ${schoolName} ditetapkan untuk ${student.name}!`);
-        }
-
-        /* ============================================================
-           DATA IMPORT & EXPORT & SAMPLE DATA
-        ============================================================ */
-        function loadSampleData() {
-            state = {
+        // SAMPLE DATA LOADER
+        function loadSampleData(showToastAlert = true) {
+            const stdId = 'std_sample_1';
+            appData = {
                 students: [
-                    { id: "s1", name: "Adam Harith", level: "Tahun 4 Cemerlang", school: "SK Taman Melawati", avatarData: "" }
+                    { id: stdId, name: 'Amirul Hafiz', level: 'Tahun 4 Cemerlang', school: 'SK Taman Melawati', avatarUrl: '' }
                 ],
-                activeStudentId: "s1",
+                activeStudentId: stdId,
                 schedules: [
-                    { id: "sc1", studentId: "s1", day: 1, subject: "Bahasa Melayu", start: "07:30", end: "08:30", books: ["Buku Teks BM Jilid 1", "Buku Latihan A"], note: "Ejaan halaman 12", type: "subjek", reminder: 10 },
-                    { id: "sc2", studentId: "s1", day: 1, subject: "Matematik", start: "08:30", end: "09:30", books: ["Buku Teks Matematik", "Buku Petak"], note: "Bawa pembaris", type: "subjek", reminder: 10 },
-                    { id: "sc3", studentId: "s1", day: 1, subject: "Pendidikan Islam", start: "10:00", end: "11:00", books: ["Buku Teks PI"], note: "", type: "subjek", reminder: 10 },
-                    { id: "sc4", studentId: "s1", day: 2, subject: "Sains", start: "07:30", end: "08:30", books: ["Buku Teks Sains", "Buku Amali"], note: "", type: "subjek", reminder: 10 },
-                    { id: "sc5", studentId: "s1", day: 3, subject: "Bahasa Inggeris", start: "07:30", end: "08:30", books: ["English Textbook", "Workbook"], note: "", type: "subjek", reminder: 10 }
+                    { id: 'sch_1', studentId: stdId, day: '1', type: 'subjek', subject: 'Bahasa Melayu', startTime: '07:30', endTime: '08:30', teacher: 'Cikgu Hasnah', location: 'Bilik Darjah 4C', books: 'Buku Teks BM, Buku Latihan 1' },
+                    { id: 'sch_2', studentId: stdId, day: '1', type: 'subjek', subject: 'Matematik', startTime: '08:30', endTime: '09:30', teacher: 'Cikgu Razak', location: 'Bilik Darjah 4C', books: 'Buku Teks Matematik, Buku Latihan 2' },
+                    { id: 'sch_3', studentId: stdId, day: '1', type: 'subjek', subject: 'Sains', startTime: '10:00', endTime: '11:00', teacher: 'Cikgu Wong', location: 'Makmal Sains 1', books: 'Buku Teks Sains, Amali Sains' },
+                    { id: 'sch_4', studentId: stdId, day: '2', type: 'subjek', subject: 'Bahasa Inggeris', startTime: '07:30', endTime: '08:30', teacher: 'Mrs. Sarah', location: 'Bilik Darjah 4C', books: 'English Textbook, Workbook' },
+                    { id: 'sch_5', studentId: stdId, day: '2', type: 'subjek', subject: 'Pendidikan Islam', startTime: '08:30', endTime: '09:30', teacher: 'Ustaz Ahmad', location: 'Surau Sekolah', books: 'Buku Agama, Buku Iqra' },
+                    { id: 'sch_6', studentId: stdId, day: '3', type: 'kokurikulum', subject: 'Aktiviti Pengakap', startTime: '14:00', endTime: '16:00', teacher: 'En. Kamal', location: 'Dewan Sekolah', books: 'Uniform Lengkap Pengakap, Buku Log' }
+                ],
+                packedState: {},
+                tasks: [
+                    { id: 'tsk_1', studentId: stdId, title: 'Latihan Matematik MS 42-45', subject: 'Matematik', dueDate: '2026-08-20', completed: false },
+                    { id: 'tsk_2', studentId: stdId, title: 'Esei pendek Cita-cita Saya', subject: 'Bahasa Melayu', dueDate: '2026-08-22', completed: true }
                 ],
                 cocurricular: [
-                    { id: "co1", studentId: "s1", category: "uniform", day: 3, name: "Pengakap Kanak-Kanak", start: "14:30", end: "16:30", uniform: "Uniform Lengkap Pengakap", role: "Ketua Sekawan", location: "Dewan Utama Sekolah", items: ["Buku Log Pengakap", "Tali Rotan (1 Meter)", "Wisel"] },
-                    { id: "co2", studentId: "s1", category: "sukan", day: 2, name: "Kelab Bola Sepak", start: "17:00", end: "18:30", uniform: "Baju T-Sukan Sekolah", role: "Ahli Pasukan", location: "Padang Bola Sekolah", items: ["Kasut Bola Sepak", "Shin Guard", "Botol Air"] },
-                    { id: "co3", studentId: "s1", category: "persatuan", day: 4, name: "Kelab STEM & Inovasi", start: "14:30", end: "15:30", uniform: "Uniform Sekolah Biasa", role: "AJK Publisiti", location: "Makmal Komputer", items: ["Fail Projek STEM", "Alat Tulis Khas"] }
-                ],
-                tasks: [
-                    { id: "t1", studentId: "s1", title: "Latihan Matematik M/S 40", dueDate: "2026-08-20", completed: false }
-                ],
-                packedBooks: {}
+                    { id: 'coco_1', studentId: stdId, name: 'Pengakap Kanak-Kanak', category: 'uniform', day: '3', time: '2:00 PM - 4:00 PM', venue: 'Dewan Terbuka', notes: 'Baju Uniform Lengkap & Skaf' },
+                    { id: 'coco_2', studentId: stdId, name: 'Kelab Catur', category: 'persatuan', day: '3', time: '4:00 PM - 5:00 PM', venue: 'Pusat Sumber', notes: 'Bawa papan catur sendiri (jika ada)' }
+                ]
             };
-            saveState();
+
+            saveAppData();
             renderAll();
-            showToast("Data contoh sekolah telah dimuatkan! 🪄");
+            if (showToastAlert) showToast("Data contoh sekolah berjaya dimuatkan!");
         }
 
+        // BACKUP EXPORT & IMPORT
         function exportAppData() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
-            const downloadAnchor = document.createElement("a");
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData, null, 2));
+            const downloadAnchor = document.createElement('a');
             downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", `beg-sekolah-backup-${new Date().toISOString().slice(0,10)}.json`);
+            downloadAnchor.setAttribute("download", `BegSekolah_Backup_${new Date().toISOString().slice(0,10)}.json`);
             document.body.appendChild(downloadAnchor);
             downloadAnchor.click();
             downloadAnchor.remove();
-            showToast("Backup data dieksport.");
+            showToast("Fail backup JSON berjaya dimuat turun!");
         }
 
         function importAppData(event) {
@@ -2239,154 +2066,47 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
-                    const imported = JSON.parse(e.target.result);
-                    if (imported && Array.isArray(imported.students)) {
-                        state = imported;
-                        saveState();
+                    const parsed = JSON.parse(e.target.result);
+                    if (parsed && Array.isArray(parsed.students)) {
+                        appData = parsed;
+                        saveAppData();
                         renderAll();
-                        showToast("Data berjaya diimport! 🎉");
+                        showToast("Data simpanan berjaya di-import!");
                     } else {
-                        showToast("Format fail tidak sah.");
+                        alert("Format fail JSON tidak sah.");
                     }
-                } catch (err) {
-                    showToast("Ralat membaca fail backup.");
+                } catch(err) {
+                    alert("Ralat membaca fail backup.");
                 }
             };
             reader.readAsText(file);
         }
 
-        /* ============================================================
-           NOTIFICATION & SOUND TIMER ENGINE
-        ============================================================ */
+        // NOTIFICATIONS API
         function enableNotifications() {
-            if (!("Notification" in window)) {
-                showToast("Pelayar anda tidak menyokong notifikasi web.");
-                return;
-            }
-            Notification.requestPermission().then(perm => {
-                if (perm === "granted") {
-                    showToast("Notifikasi diaktifkan! 🔔");
-                    new Notification("Beg Sekolah", { body: "Peringatan waktu dan sekolah kini aktif." });
-                } else {
-                    showToast("Izin notifikasi dinafikan.");
-                }
-            });
-        }
-
-        function startReminderTimer() {
-            checkReminders();
-            setInterval(checkReminders, 30000);
-        }
-
-        function checkReminders() {
-            const student = getActiveStudent();
-            if (!student) return;
-
-            const now = new Date();
-            const currentDay = now.getDay();
-            const currentMinutes = now.getHours() * 60 + now.getMinutes();
-
-            const todaySchedules = getStudentSchedulesForDay(currentDay);
-
-            todaySchedules.forEach(schedule => {
-                if (!schedule.start) return;
-                const [h, m] = schedule.start.split(":").map(Number);
-                const classStartMinutes = h * 60 + m;
-                const reminderMinutes = classStartMinutes - (schedule.reminder || 10);
-
-                if (currentMinutes === reminderMinutes) {
-                    const notifyKey = `notified_${now.toDateString()}_${schedule.id}`;
-                    if (!localStorage.getItem(notifyKey)) {
-                        localStorage.setItem(notifyKey, "true");
-                        triggerNotification(schedule);
+            if ("Notification" in window) {
+                Notification.requestPermission().then(permission => {
+                    if (permission === "granted") {
+                        new Notification("Beg Sekolah 🎒", {
+                            body: "Peringatan notifikasi bagi jadual sekolah & pengemasan beg diaktifkan!"
+                        });
+                        showToast("Notifikasi diaktifkan!");
+                    } else {
+                        alert("Kebenaran notifikasi dinafikan pada pelayar ini.");
                     }
-                }
-            });
-        }
-
-        function triggerNotification(schedule) {
-            playChimeSound();
-            const msg = `Kelas ${schedule.subject} bermula jam ${schedule.start}. ${schedule.books?.length ? 'Buku: ' + schedule.books.join(', ') : ''}`;
-
-            if ("Notification" in window && Notification.permission === "granted") {
-                new Notification(`🎒 Peringatan Subjek: ${schedule.subject}`, {
-                    body: msg,
-                    tag: schedule.id
                 });
             } else {
-                showToast(`⏰ ${msg}`);
+                alert("Pelayar ini tidak menyokong Web Notification.");
             }
         }
 
-        function playChimeSound() {
-            try {
-                const AudioContext = window.AudioContext || window.webkitAudioContext;
-                if (!AudioContext) return;
-                const ctx = new AudioContext();
-
-                const notes = [523.25, 659.25, 783.99];
-                notes.forEach((freq, idx) => {
-                    const osc = ctx.createOscillator();
-                    const gain = ctx.createGain();
-
-                    osc.type = 'sine';
-                    osc.frequency.value = freq;
-
-                    const startTime = ctx.currentTime + (idx * 0.12);
-                    gain.gain.setValueAtTime(0.001, startTime);
-                    gain.gain.exponentialRampToValueAtTime(0.2, startTime + 0.05);
-                    gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.4);
-
-                    osc.connect(gain);
-                    gain.connect(ctx.destination);
-
-                    osc.start(startTime);
-                    osc.stop(startTime + 0.45);
-                });
-            } catch (e) {
-                console.log("Audio tidak disokong atau dihalang.");
-            }
-        }
-
-        /* ============================================================
-           HELPERS & MODAL CONTROLS
-        ============================================================ */
-        function getTypeEmoji(type) {
-            switch(type) {
-                case 'kokurikulum': return '🏃';
-                case 'peperiksaan': return '📝';
-                case 'aktiviti': return '🎯';
-                default: return '📚';
-            }
-        }
-
-        function showModal(id) {
-            document.getElementById(id).classList.add("show");
+        // MODAL HELPERS
+        function openModal(id) {
+            document.getElementById(id).classList.add('show');
         }
 
         function closeModal(id) {
-            document.getElementById(id).classList.remove("show");
-        }
-
-        function showToast(msg) {
-            const toast = document.getElementById("toast");
-            toast.textContent = msg;
-            toast.classList.add("show");
-            clearTimeout(window.toastTimer);
-            window.toastTimer = setTimeout(() => toast.classList.remove("show"), 3500);
-        }
-
-        function escapeHtml(str) {
-            return String(str ?? '')
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
-
-        function escapeAttribute(str) {
-            return String(str ?? '').replace(/'/g, "\\'");
+            document.getElementById(id).classList.remove('show');
         }
     </script>
 </body>
